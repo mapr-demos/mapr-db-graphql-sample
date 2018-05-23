@@ -36,4 +36,14 @@
     <security-role>
         <role-name>admin</role-name>
     </security-role>
+
+    <servlet>
+      <servlet-name>GraphQLEndpoint</servlet-name>
+      <servlet-class>com.mapr.music.api.graphql.GraphQLEndpoint</servlet-class>
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>GraphQLEndpoint</servlet-name>
+      <url-pattern>/graphql</url-pattern>
+    </servlet-mapping>
+
 </web-app>

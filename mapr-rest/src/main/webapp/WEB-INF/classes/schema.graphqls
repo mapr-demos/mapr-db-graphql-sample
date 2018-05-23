@@ -1,0 +1,42 @@
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Query {
+    album(id: String): Album
+}
+
+type Mutation {
+    createAlbum(album: AlbumInput!): Album
+    updateAlbum(album: AlbumInput!): Album
+    deleteAlbum(id: String!): Boolean
+}
+
+type Album {
+    id: String!
+    name: String
+    style: String
+    barcode: String
+    status: String
+    packaging: String
+    language: String
+    script: String
+    MBID: String
+    format: String
+    country: String
+}
+
+input AlbumInput {
+  _id: String
+  name: String
+  style: String
+  barcode: String
+  status: String
+  packaging: String
+  language: String
+  script: String
+  MBID: String
+  format: String
+  country: String
+}
