@@ -144,7 +144,7 @@ public class Artist {
     private String profileImageUrl;
 
     @JsonProperty("images_urls")
-    private String[] imagesUrls;
+    private List<String> imagesUrls;
 
     private ODate beginDate;
 
@@ -263,11 +263,11 @@ public class Artist {
         this.profileImageUrl = profileImageUrl;
     }
 
-    public String[] getImagesUrls() {
+    public List<String> getImagesUrls() {
         return imagesUrls;
     }
 
-    public void setImagesUrls(String[] imagesUrls) {
+    public void setImagesUrls(List<String> imagesUrls) {
         this.imagesUrls = imagesUrls;
     }
 

@@ -32,7 +32,7 @@ Contains `6117` Album JSON documents, which are ready to be imported into MapR-D
      "slug_postfix": {
         "$numberLong": 2
      },
-     "MBID": "0a1aa2f3-b3bf-4527-b235-1027888e6f7f",
+     "mbid": "0a1aa2f3-b3bf-4527-b235-1027888e6f7f",
      "artists": [
         {
            "rating": 2.7837837,
@@ -53,7 +53,7 @@ Contains `6117` Album JSON documents, which are ready to be imported into MapR-D
               "$numberLong": 1
            },
            "mbid": "32a9ee2d-7a3f-3b36-b554-168a86e5c734",
-           "MBID": "32a9ee2d-7a3f-3b36-b554-168a86e5c734"
+           "mbid": "32a9ee2d-7a3f-3b36-b554-168a86e5c734"
         },
         {
            "id": "dd5afba2-782c-3b41-8e53-d119529b5884",
@@ -65,7 +65,7 @@ Contains `6117` Album JSON documents, which are ready to be imported into MapR-D
               "$numberLong": 3
            },
            "mbid": "dd5afba2-782c-3b41-8e53-d119529b5884",
-           "MBID": "dd5afba2-782c-3b41-8e53-d119529b5884"
+           "mbid": "dd5afba2-782c-3b41-8e53-d119529b5884"
         },
         {
            "id": "84d47443-29d5-3aa4-82e9-41b633f7c778",
@@ -77,7 +77,7 @@ Contains `6117` Album JSON documents, which are ready to be imported into MapR-D
               "$numberLong": 5
            },
            "mbid": "84d47443-29d5-3aa4-82e9-41b633f7c778",
-           "MBID": "84d47443-29d5-3aa4-82e9-41b633f7c778"
+           "mbid": "84d47443-29d5-3aa4-82e9-41b633f7c778"
         },
         {
            "id": "287b244f-7d41-3d67-b5aa-8e0513949fee",
@@ -89,7 +89,7 @@ Contains `6117` Album JSON documents, which are ready to be imported into MapR-D
               "$numberLong": 9
            },
            "mbid": "287b244f-7d41-3d67-b5aa-8e0513949fee",
-           "MBID": "287b244f-7d41-3d67-b5aa-8e0513949fee"
+           "mbid": "287b244f-7d41-3d67-b5aa-8e0513949fee"
         },
         {
            "id": "233eedc5-8737-3fea-abbf-4fb6c18e354f",
@@ -101,7 +101,7 @@ Contains `6117` Album JSON documents, which are ready to be imported into MapR-D
               "$numberLong": 11
            },
            "mbid": "233eedc5-8737-3fea-abbf-4fb6c18e354f",
-           "MBID": "233eedc5-8737-3fea-abbf-4fb6c18e354f"
+           "mbid": "233eedc5-8737-3fea-abbf-4fb6c18e354f"
         },
         {
            "id": "06a5f4c4-ff01-37d2-8da1-f886564e3512",
@@ -113,7 +113,7 @@ Contains `6117` Album JSON documents, which are ready to be imported into MapR-D
               "$numberLong": 6
            },
            "mbid": "06a5f4c4-ff01-37d2-8da1-f886564e3512",
-           "MBID": "06a5f4c4-ff01-37d2-8da1-f886564e3512"
+           "mbid": "06a5f4c4-ff01-37d2-8da1-f886564e3512"
         },
         {
            "id": "dac52e35-9237-37c2-a16e-d93cdac49902",
@@ -125,7 +125,7 @@ Contains `6117` Album JSON documents, which are ready to be imported into MapR-D
               "$numberLong": 7
            },
            "mbid": "dac52e35-9237-37c2-a16e-d93cdac49902",
-           "MBID": "dac52e35-9237-37c2-a16e-d93cdac49902"
+           "mbid": "dac52e35-9237-37c2-a16e-d93cdac49902"
         },
         {
            "id": "d4213364-1fb5-3483-b5f2-13bbc350039d",
@@ -137,7 +137,7 @@ Contains `6117` Album JSON documents, which are ready to be imported into MapR-D
               "$numberLong": 8
            },
            "mbid": "d4213364-1fb5-3483-b5f2-13bbc350039d",
-           "MBID": "d4213364-1fb5-3483-b5f2-13bbc350039d"
+           "mbid": "d4213364-1fb5-3483-b5f2-13bbc350039d"
         },
         {
            "id": "3dc69111-7112-3dc7-b6c0-85a30919fb17",
@@ -149,7 +149,7 @@ Contains `6117` Album JSON documents, which are ready to be imported into MapR-D
               "$numberLong": 10
            },
            "mbid": "3dc69111-7112-3dc7-b6c0-85a30919fb17",
-           "MBID": "3dc69111-7112-3dc7-b6c0-85a30919fb17"
+           "mbid": "3dc69111-7112-3dc7-b6c0-85a30919fb17"
         },
         {
            "id": "4dd38c94-8013-3e9f-913b-d71286826bb0",
@@ -161,7 +161,7 @@ Contains `6117` Album JSON documents, which are ready to be imported into MapR-D
               "$numberLong": 2
            },
            "mbid": "4dd38c94-8013-3e9f-913b-d71286826bb0",
-           "MBID": "4dd38c94-8013-3e9f-913b-d71286826bb0"
+           "mbid": "4dd38c94-8013-3e9f-913b-d71286826bb0"
         },
         {
            "id": "c0ffeea5-ffc6-316f-819c-13958450e9be",
@@ -173,7 +173,7 @@ Contains `6117` Album JSON documents, which are ready to be imported into MapR-D
               "$numberLong": 4
            },
            "mbid": "c0ffeea5-ffc6-316f-819c-13958450e9be",
-           "MBID": "c0ffeea5-ffc6-316f-819c-13958450e9be"
+           "mbid": "c0ffeea5-ffc6-316f-819c-13958450e9be"
         }
      ],
      "cover_image_url": "http://coverartarchive.org/release/0a1aa2f3-b3bf-4527-b235-1027888e6f7f/929069980.jpg",
@@ -208,7 +208,7 @@ Contains `10281` Artist JSON documents, which are ready to be imported into MapR
      "slug_postfix": {
         "$numberLong": 0
      },
-     "MBID": "966e1095-b172-415c-bae5-53f8041fd050",
+     "mbid": "966e1095-b172-415c-bae5-53f8041fd050",
      "disambiguation_comment": "American Idol",
      "albums": [
         {

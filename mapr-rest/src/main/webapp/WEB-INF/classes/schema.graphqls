@@ -1,33 +1,58 @@
 schema {
-    query: Query
-    mutation: Mutation
+  query: Query
+  mutation: Mutation
 }
 
 type Query {
-    album(id: String): Album
+  album(id: String): Album
 }
 
 type Mutation {
-    createAlbum(album: AlbumInput!): Album
-    updateAlbum(album: AlbumInput!): Album
-    deleteAlbum(id: String!): Boolean
+  createAlbum(album: AlbumInput!): Album
+  updateAlbum(album: AlbumInput!): Album
+  deleteAlbum(id: String!): Boolean
 }
 
 type Album {
-    id: String!
-    name: String
-    style: String
-    barcode: String
-    status: String
-    packaging: String
-    language: String
-    script: String
-    MBID: String
-    format: String
-    country: String
+  id: String!
+  artists: [Artist]
+  tracks: [Track]
+  name: String
+  style: String
+  barcode: String
+  coverImageUrl: String
+  imagesUrls: [String]
+  status: String
+  packaging: String
+  language: String
+  script: String
+  mbid: String
+  format: String
+  country: String
+}
+
+type Artist {
+  id: String!
+  albums: [Album]
+  name: String
+  gender: String
+  rating: Float
+  profileImageUrl: String
+  imagesUrls: [String]
+  disambiguationComment: String
+  mbid: String
+  area: String
+}
+
+type Track {
+  id: String!
+  name: String
+  length: Int
+  position: Int
 }
 
 input AlbumInput {
+  #  FIXME
   _id: String
   name: String
   style: String
@@ -36,7 +61,7 @@ input AlbumInput {
   packaging: String
   language: String
   script: String
-  MBID: String
+  mbid: String
   format: String
   country: String
 }

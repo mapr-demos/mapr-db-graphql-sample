@@ -112,8 +112,8 @@ public class Album {
     @JsonProperty("script")
     private String script;
 
-    @JsonProperty("MBID")
-    private String MBID;
+    @JsonProperty("mbid")
+    private String mbid;
 
     @JsonProperty("format")
     private String format;

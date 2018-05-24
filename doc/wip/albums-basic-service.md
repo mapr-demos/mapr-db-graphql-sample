@@ -91,7 +91,7 @@ public class Album {
     private String packaging;
     private String language;
     private String script;
-    private String MBID;
+    private String mbid;
     private String format;
     private String country;
     private List reviews;

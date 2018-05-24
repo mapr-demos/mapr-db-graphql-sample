@@ -23,7 +23,7 @@ public class AlbumDto {
     private String packaging;
     private String language;
     private String script;
-    private String MBID;
+    private String mbid;
     private String format;
     private String country;
     private List reviews;
@@ -76,7 +76,7 @@ public class AlbumDto {
         this.slug = slug;
     }
 
-    public List<ArtistDto> getArtistList() {
+    public List<ArtistDto> getArtists() {
         return artistList;
     }
 
@@ -92,7 +92,7 @@ public class AlbumDto {
         this.catalogNumbers = catalogNumbers;
     }
 
-    public List<TrackDto> getTrackList() {
+    public List<TrackDto> getTracks() {
         return trackList;
     }
 
@@ -196,12 +196,12 @@ public class AlbumDto {
         this.script = script;
     }
 
-    public String getMBID() {
-        return MBID;
+    public String getMbid() {
+        return mbid;
     }
 
-    public void setMBID(String MBID) {
-        this.MBID = MBID;
+    public void setMbid(String mbid) {
+        this.mbid = mbid;
     }
 
     public Double getRating() {

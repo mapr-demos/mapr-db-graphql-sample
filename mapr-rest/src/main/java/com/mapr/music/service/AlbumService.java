@@ -705,18 +705,18 @@ public class AlbumService implements PaginatedService {
             throw new RuntimeException("Can not create album Data Transfer Object", e);
         }
 
-        if (albumDto.getTrackList() != null && !albumDto.getTrackList().isEmpty()) {
+        if (albumDto.getTracks() != null && !albumDto.getTracks().isEmpty()) {
 
-            List<Track> trackList = albumDto.getTrackList().stream()
+            List<Track> trackList = albumDto.getTracks().stream()
                     .map(this::dtoToTrack)
                     .collect(toList());
 
             album.setTrackList(trackList);
         }
 
-        if (albumDto.getArtistList() != null && !albumDto.getArtistList().isEmpty()) {
+        if (albumDto.getArtists() != null && !albumDto.getArtists().isEmpty()) {
 
-            List<Artist.ShortInfo> artistShortInfoList = albumDto.getArtistList().stream()
+            List<Artist.ShortInfo> artistShortInfoList = albumDto.getArtists().stream()
                     .map(this::artistDtoToShortInfo)
                     .collect(toList());
 
