@@ -1,5 +1,6 @@
 package com.mapr.music.api.graphql;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.service.AlbumService;
@@ -20,6 +21,8 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
 
   private static final String SCHEMA_FILENAME = "schema.graphqls";
 
+  private static final ObjectMapper MAPPER = new ObjectMapper();
+
   @Inject
   public GraphQLEndpoint(AlbumService albumService, ArtistService artistService) {
     super(createGraphQLSchema(albumService, artistService));
@@ -38,12 +41,23 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
     return RuntimeWiring.newRuntimeWiring()
       .type("Query", typeWiring -> typeWiring
         .dataFetcher("album", (env) -> albumService.getAlbumById(env.getArgument("id")))
+        .dataFetcher("artist", (env) -> artistService.getArtistById(env.getArgument("id")))
       )
       .type("Mutation", typeWiring -> typeWiring
-        .dataFetcher("createAlbum", (env) -> albumService.createAlbum(env.getArgument("album")))
-        .dataFetcher("updateAlbum", (env) -> albumService.updateAlbum(env.getArgument("album")))
+        .dataFetcher("createAlbum",
+          (env) -> albumService.createAlbum(MAPPER.convertValue(env.getArgument("album"), AlbumDto.class)))
+        .dataFetcher("updateAlbum",
+          (env) -> albumService.updateAlbum(MAPPER.convertValue(env.getArgument("album"), AlbumDto.class)))
         .dataFetcher("deleteAlbum", (env) -> {
           albumService.deleteAlbumById(env.getArgument("id"));
+          return true;
+        })
+        .dataFetcher("createArtist",
+          (env) -> artistService.createArtist(MAPPER.convertValue(env.getArgument("artist"), ArtistDto.class)))
+        .dataFetcher("updateArtist",
+          (env) -> artistService.updateArtist(MAPPER.convertValue(env.getArgument("artist"), ArtistDto.class)))
+        .dataFetcher("deleteArtist", (env) -> {
+          artistService.deleteArtistById(env.getArgument("id"));
           return true;
         })
       )

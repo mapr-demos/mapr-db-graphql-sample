@@ -5,14 +5,20 @@ schema {
 
 type Query {
   album(id: String): Album
+  artist(id: String): Artist
 }
 
 type Mutation {
   createAlbum(album: AlbumInput!): Album
   updateAlbum(album: AlbumInput!): Album
   deleteAlbum(id: String!): Boolean
+
+  createArtist(artist: ArtistInput!): Artist
+  updateArtist(artist: ArtistInput!): Artist
+  deleteArtist(id: String!): Boolean
 }
 
+# TODO review for date types
 type Album {
   id: String!
   artists: [Artist]
@@ -31,6 +37,7 @@ type Album {
   country: String
 }
 
+# TODO review for date types
 type Artist {
   id: String!
   albums: [Album]
@@ -51,8 +58,8 @@ type Track {
   position: Int
 }
 
+# TODO review
 input AlbumInput {
-  #  FIXME
   _id: String
   name: String
   style: String
@@ -64,4 +71,17 @@ input AlbumInput {
   mbid: String
   format: String
   country: String
+}
+
+# TODO review
+input ArtistInput {
+  _id: String
+  name: String
+  gender: String
+  rating: Float
+  profileImageUrl: String
+  imagesUrls: [String]
+  disambiguationComment: String
+  mbid: String
+  area: String
 }
