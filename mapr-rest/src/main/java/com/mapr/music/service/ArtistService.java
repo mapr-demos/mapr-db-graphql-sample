@@ -19,6 +19,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  * Responsible of performing all business logic on {@link Artist} model.
  */
@@ -196,6 +198,24 @@ public class ArtistService implements PaginatedService {
         }
 
         return artistDto;
+    }
+
+    public List<ArtistDto> getArtists(Integer offset, Integer limit) {
+
+        if (offset == null || limit == null) {
+          throw new IllegalArgumentException("Offset and limit can not be null");
+        }
+
+        if (offset < 0|| limit < 0) {
+          throw new IllegalArgumentException("Offset and limit can not be negative");
+        }
+
+        List<Artist> artists = artistDao.getList(offset, limit);
+        if (artists == null) {
+          throw new ResourceNotFoundException("Artists not found for offset = '" + offset + "', limit = '" + limit + "'");
+        }
+
+        return artists.stream().map(this::artistToDto).collect(toList());
     }
 
     /**

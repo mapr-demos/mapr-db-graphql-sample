@@ -244,6 +244,24 @@ public class AlbumService implements PaginatedService {
         return albumToDto(album);
     }
 
+    public List<AlbumDto> getAlbums(Integer offset, Integer limit) {
+
+        if (offset == null || limit == null) {
+            throw new IllegalArgumentException("Offset and limit can not be null");
+        }
+
+        if (offset < 0|| limit < 0) {
+            throw new IllegalArgumentException("Offset and limit can not be negative");
+        }
+
+        List<Album> albums = albumDao.getList(offset, limit);
+        if (albums == null) {
+            throw new ResourceNotFoundException("Albums not found for offset = '" + offset + "', limit = '" + limit + "'");
+        }
+
+        return albums.stream().map(this::albumToDto).collect(toList());
+    }
+
     /**
      * Returns single album by it's slug name.
      *

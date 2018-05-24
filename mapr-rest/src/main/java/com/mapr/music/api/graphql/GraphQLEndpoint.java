@@ -41,7 +41,17 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
     return RuntimeWiring.newRuntimeWiring()
       .type("Query", typeWiring -> typeWiring
         .dataFetcher("album", (env) -> albumService.getAlbumById(env.getArgument("id")))
+        .dataFetcher("albums", (env) -> {
+          Integer offset = env.getArgument("offset");
+          Integer limit = env.getArgument("limit");
+          return albumService.getAlbums(offset, limit);
+        })
         .dataFetcher("artist", (env) -> artistService.getArtistById(env.getArgument("id")))
+        .dataFetcher("artists", (env) -> {
+          Integer offset = env.getArgument("offset");
+          Integer limit = env.getArgument("limit");
+          return artistService.getArtists(offset, limit);
+        })
       )
       .type("Mutation", typeWiring -> typeWiring
         .dataFetcher("createAlbum",

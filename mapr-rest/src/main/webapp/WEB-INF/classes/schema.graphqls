@@ -5,7 +5,9 @@ schema {
 
 type Query {
   album(id: String): Album
+  albums(offset: Int, limit: Int): [Album]
   artist(id: String): Artist
+  artists(offset: Int, limit: Int): [Artist]
 }
 
 type Mutation {
