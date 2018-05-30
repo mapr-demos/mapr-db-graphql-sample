@@ -8,6 +8,7 @@ type Query {
   albums(offset: Int, limit: Int): [Album]
   artist(id: String): Artist
   artists(offset: Int, limit: Int): [Artist]
+  currentUser : User
 }
 
 type Mutation {
@@ -20,7 +21,6 @@ type Mutation {
   deleteArtist(id: String!): Boolean
 }
 
-# TODO review for date types
 type Album {
   id: String!
   artists: [Artist]
@@ -39,7 +39,6 @@ type Album {
   country: String
 }
 
-# TODO review for date types
 type Artist {
   id: String!
   albums: [Album]
@@ -60,7 +59,13 @@ type Track {
   position: Int
 }
 
-# TODO review
+type User {
+  username: String
+  firstName: String
+  lastName: String
+  password: String
+}
+
 input AlbumInput {
   _id: String
   name: String
@@ -75,7 +80,6 @@ input AlbumInput {
   country: String
 }
 
-# TODO review
 input ArtistInput {
   _id: String
   name: String
@@ -87,3 +91,4 @@ input ArtistInput {
   mbid: String
   area: String
 }
+

@@ -46,4 +46,13 @@
       <url-pattern>/graphql</url-pattern>
     </servlet-mapping>
 
+    <filter>
+      <filter-name>UserPrincipalPlainServletFilter</filter-name>
+      <filter-class>com.mapr.music.util.UserPrincipalPlainServletFilter</filter-class>
+    </filter>
+    <filter-mapping>
+      <filter-name>UserPrincipalPlainServletFilter</filter-name>
+      <url-pattern>/graphql</url-pattern>
+    </filter-mapping>
+
 </web-app>
