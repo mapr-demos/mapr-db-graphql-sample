@@ -1,94 +1,123 @@
 schema {
-  query: Query
-  mutation: Mutation
+    query: Query
+    mutation: Mutation
 }
 
 type Query {
-  album(id: String): Album
-  albums(offset: Int, limit: Int): [Album]
-  artist(id: String): Artist
-  artists(offset: Int, limit: Int): [Artist]
-  currentUser : User
+
+    # Albums queries
+    album(id: String): Album
+    albumBySlug(slug: String): Album
+    albums(offset: Int, limit: Int): [Album]
+    albumsRecommended(albumId: String, limit: Int): [Album]
+    totalAlbums: Long
+
+    # Artists queries
+    artist(id: String): Artist
+    artists(offset: Int, limit: Int): [Artist]
+    artistsByNameEntry(nameEntry: String, limit: Long): [Artist]
+    totalArtists: Long
+    currentUser : User
 }
 
 type Mutation {
-  createAlbum(album: AlbumInput!): Album
-  updateAlbum(album: AlbumInput!): Album
-  deleteAlbum(id: String!): Boolean
 
-  createArtist(artist: ArtistInput!): Artist
-  updateArtist(artist: ArtistInput!): Artist
-  deleteArtist(id: String!): Boolean
+    # Albums mutations
+    createAlbum(album: AlbumInput!): Album
+    updateAlbum(album: AlbumInput!): Album
+    deleteAlbum(id: String!): Boolean
+    deleteTrackInAlbum(albumId: String, trackId: String) : Album
+    saveAlbumTracks(albumId: String, tracks: [TrackInput]) : Album
+    updateAlbumTrack(albumId: String, track: TrackInput) : Album
+    addTrackToAlbum(albumId: String, track: TrackInput) : Track
+    changeAlbumRating(albumId: String!, rating: Float!): Float
+
+    # Artists mutations
+    createArtist(artist: ArtistInput!): Artist
+    updateArtist(artist: ArtistInput!): Artist
+    deleteArtist(id: String!): Boolean
 }
 
 type Album {
-  id: String!
-  artists: [Artist]
-  tracks: [Track]
-  name: String
-  style: String
-  barcode: String
-  coverImageUrl: String
-  imagesUrls: [String]
-  status: String
-  packaging: String
-  language: String
-  script: String
-  mbid: String
-  format: String
-  country: String
+    id: String!
+    artists: [Artist]
+    tracks: [Track]
+    name: String
+    style: String
+    barcode: String
+    coverImageUrl: String
+    imagesUrls: [String]
+    status: String
+    packaging: String
+    language: String
+    script: String
+    mbid: String
+    format: String
+    country: String
+    slug: String
+    rating: Float
 }
 
 type Artist {
-  id: String!
-  albums: [Album]
-  name: String
-  gender: String
-  rating: Float
-  profileImageUrl: String
-  imagesUrls: [String]
-  disambiguationComment: String
-  mbid: String
-  area: String
+    id: String!
+    albums: [Album]
+    name: String
+    gender: String
+    rating: Float
+    profileImageUrl: String
+    imagesUrls: [String]
+    disambiguationComment: String
+    mbid: String
+    area: String
+    slug: String
 }
 
 type Track {
-  id: String!
-  name: String
-  length: Int
-  position: Int
+    id: String!
+    name: String
+    length: Long
+    position: Long
 }
 
 type User {
-  username: String
-  firstName: String
-  lastName: String
-  password: String
+    username: String
+    firstName: String
+    lastName: String
+    password: String
 }
 
 input AlbumInput {
-  _id: String
-  name: String
-  style: String
-  barcode: String
-  status: String
-  packaging: String
-  language: String
-  script: String
-  mbid: String
-  format: String
-  country: String
+    _id: String
+    name: String
+    style: String
+    barcode: String
+    status: String
+    packaging: String
+    language: String
+    script: String
+    mbid: String
+    format: String
+    country: String
+    coverImageUrl: String
+    artists: [ArtistInput]
+    tracks: [TrackInput]
 }
 
 input ArtistInput {
-  _id: String
-  name: String
-  gender: String
-  rating: Float
-  profileImageUrl: String
-  imagesUrls: [String]
-  disambiguationComment: String
-  mbid: String
-  area: String
+    _id: String
+    name: String
+    gender: String
+    rating: Float
+    profileImageUrl: String
+    imagesUrls: [String]
+    disambiguationComment: String
+    mbid: String
+    area: String
 }
 
+input TrackInput {
+    _id: String
+    name: String
+    length: Long
+    position: Long
+}

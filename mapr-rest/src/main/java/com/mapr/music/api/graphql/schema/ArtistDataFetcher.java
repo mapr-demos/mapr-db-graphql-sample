@@ -7,11 +7,10 @@ import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.service.AlbumService;
 import com.mapr.music.service.ArtistService;
 import graphql.schema.DataFetcher;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-
-import javax.inject.Inject;
 import java.security.Principal;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 public class ArtistDataFetcher {
 
@@ -36,6 +35,18 @@ public class ArtistDataFetcher {
       Integer limit = env.getArgument("limit");
       return artistService.getArtists(offset, limit);
     };
+  }
+
+  public DataFetcher artistsByNameEntry() {
+    return (env) -> {
+      String nameEntry = env.getArgument("nameEntry");
+      Long limit = env.getArgument("limit");
+      return artistService.searchArtists(nameEntry, limit);
+    };
+  }
+
+  public DataFetcher totalArtists() {
+    return (env) -> artistService.getTotalNum();
   }
 
   public DataFetcher createArtist() {
@@ -79,7 +90,7 @@ public class ArtistDataFetcher {
         return source.getAlbums();
       } else {
         return source.getAlbums().stream().map(AlbumDto::getId).map(albumService::getAlbumById)
-          .collect(Collectors.toList());
+            .collect(Collectors.toList());
       }
     };
   }

@@ -69,15 +69,15 @@ interface PageRequest {
 }
 
 const mapToArtist = ({
-                       _id,
+                       id,
                        name,
                        slug,
-                       profile_image_url
+                       profileImageUrl
                      }): Artist => ({
-  id: _id,
+  id: id,
   name,
   slug,
-  avatarURL: profile_image_url
+  avatarURL: profileImageUrl
 });
 
 const mapToTrack = ({
@@ -93,9 +93,9 @@ const mapToTrack = ({
 });
 
 const mapToAlbum = ({
-                      _id,
+                      id,
                       name,
-                      cover_image_url,
+                      coverImageUrl,
                       country,
                       artists,
                       format,
@@ -107,9 +107,9 @@ const mapToAlbum = ({
                       rating,
                       released_date
                     }): Album => ({
-  id: _id,
+  id,
   title: name,
-  coverImageURL: cover_image_url,
+  coverImageURL: coverImageUrl,
   country,
   format,
   slug,
@@ -130,10 +130,10 @@ const mapToTrackRequest = ({
                              duration,
                              position
                            }: Track) => ({
-  id,
-  length: duration,
+  _id: id,
+  length: (duration) ? Number(duration) : null,
   name,
-  position
+  position: (position) ? Number(position) : null
 });
 
 const mapToArtistRequest = ({
@@ -144,11 +144,12 @@ const mapToArtistRequest = ({
                             }: Artist) => ({
   _id: id,
   name,
-  slug,
-  profile_image_url: avatarURL
+  // slug,
+  profileImageUrl: avatarURL
 });
 
 const mapToAlbumRequest = ({
+                             id,
                              title,
                              coverImageURL,
                              country,
@@ -159,12 +160,12 @@ const mapToAlbumRequest = ({
                              language,
                              releasedDate
                            }: Album) => ({
+  _id: id,
   name: title,
-  cover_image_url: coverImageURL,
+  coverImageUrl: coverImageURL,
   country,
   format,
-  slug,
-  released_date: (releasedDate) ? releasedDate.getTime() : null,
+  // released_date: (releasedDate) ? releasedDate.getTime() : null,
   language: (language) ? language.code : null,
   artists: artists.map(mapToArtistRequest),
   tracks: trackList.map(mapToTrackRequest)
@@ -195,24 +196,36 @@ export class AlbumService {
    * @desc get albums page from server side
    * */
   getAlbumsPage(request: PageRequest): Promise<AlbumsPage> {
-    return this.http.get(this.getAlbumsPageURL(request))
-      .flatMap((response: any) => {
-        return this.languageService.getAllLanguages().then((languages) => ({languages, response}))
+
+    console.log(request);
+
+    return this.http.post(`${this.config.apiURL}/graphql`,
+      {
+        query: "query Albums($offset: Int, $limit: Int) { albums(offset: $offset, limit: $limit){name, artists{id, name, slug}, coverImageUrl, language, slug }, totalAlbums }",
+        variables: {
+          offset: (request.pageNumber - 1) * PAGE_SIZE,
+          limit: PAGE_SIZE
+        }
+      }
+    )
+    .flatMap((response: any) => {
+      return this.languageService.getAllLanguages().then((languages) => ({languages, response}))
+    })
+    .map(({response, languages}) => {
+      console.log('Albums: ', response);
+      const albums = response.data.albums
+      .map((album) => {
+        album.language = find(languages, (language) => language.code === album.language);
+        return album;
       })
-      .map(({response, languages}) => {
-        console.log('Albums: ', response);
-        const albums = response.results
-          .map((album) => {
-            album.language = find(languages, (language) => language.code === album.language);
-            return album;
-          })
-          .map(mapToAlbum);
-        return {
-          albums,
-          totalNumber: response.pagination.items
-        };
-      })
-      .toPromise();
+      .map(mapToAlbum);
+
+      return {
+        albums,
+        totalNumber: response.data.totalAlbums
+      };
+    })
+    .toPromise();
   }
 
   /**
@@ -226,90 +239,164 @@ export class AlbumService {
    * @desc get album by slug from server side
    * */
   getAlbumBySlug(albumSlug: string): Promise<Album> {
-    return this.http.get(this.getAlbumBySlugURL(albumSlug))
-      .flatMap((response: any) => {
-        return this.languageService.getAllLanguages().then((languages) => ({languages, response}))
-      })
-      .map(({response, languages}) => {
-        console.log('Album: ', response);
-        response.language = find(languages, (language) => language.code === response.language);
-        return mapToAlbum(response);
-      })
-      .toPromise();
+    return this.http.post(`${this.config.apiURL}/graphql`,
+      {
+        query: "query AlbumBySlug($slug: String) { albumBySlug(slug: $slug){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}} }",
+        variables: {
+          slug: albumSlug
+        }
+      }
+    )
+    .flatMap((response: any) => {
+      return this.languageService.getAllLanguages().then((languages) => ({languages, response}))
+    })
+    .map(({response, languages}) => {
+      console.log('Album: ', response.data.albumBySlug);
+      response.data.albumBySlug.language = find(languages, (language) => language.code === response.data.albumBySlug.language);
+      return mapToAlbum(response.data.albumBySlug);
+    })
+    .toPromise();
   }
 
   deleteTrackInAlbum(albumId: string, trackId: string): Promise<Object> {
-    return this.http.delete(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${albumId}/tracks/${trackId}`)
-      .toPromise()
+    return this.http.post(`${this.config.apiURL}/graphql`,
+      {
+        query: "mutation DeleteAlbumTrack($albumId: String, $trackId: String!) { deleteTrackInAlbum(albumId: $albumId, trackId: $trackId){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}} }",
+        variables: {
+          albumId: albumId,
+          trackId: trackId
+        }
+      })
+    .toPromise()
   }
 
   saveAlbumTracks(albumId: string, tracks: Array<Track>): Promise<Object> {
-    return this.http.put(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${albumId}/tracks`, tracks)
-      .toPromise()
+    return this.http.post(`${this.config.apiURL}/graphql`,
+      {
+        query: "mutation SaveAlbumTracks($albumId: String, $tracks: [TrackInput!]!) { saveAlbumTracks(albumId: $albumId, tracks: $tracks){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}} }",
+        variables: {
+          albumId: albumId,
+          tracks: tracks.map(mapToTrackRequest)
+        }
+      })
+    .toPromise()
   }
 
   updateAlbumTrack(albumId: string, track: Track): Promise<Object> {
-    return this.http.put(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${albumId}/tracks/${track.id}`, track)
-      .toPromise();
+    return this.http.post(`${this.config.apiURL}/graphql`,
+      {
+        query: "mutation UpdateAlbumTrack($albumId: String, $track: TrackInput!) { updateAlbumTrack(albumId: $albumId, track: $track){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}} }",
+        variables: {
+          albumId: albumId,
+          track: mapToTrackRequest(track)
+        }
+      })
+    .toPromise();
   }
 
   addTrackToAlbum(albumId: string, track: Track): Promise<Track> {
     const request = mapToTrackRequest(track);
-    return this.http.post(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${albumId}/tracks/`, request)
-      .map((response) => {
-        return mapToTrack(response as any);
-      })
-      .toPromise();
+    return this.http.post(`${this.config.apiURL}/graphql`,
+      {
+        query: "mutation AddTrackToAlbum($albumId: String, $track: TrackInput!) { addTrackToAlbum(albumId: $albumId, track: $track){id, name, length, position} }",
+        variables: {
+          albumId: albumId,
+          track: request
+        }
+      }
+    )
+    .map((response: any) => {
+      return mapToTrack(response.data.addTrackToAlbum);
+    })
+    .toPromise();
   }
 
   searchForArtists(query: string): Observable<Array<Artist>> {
     return this.http
-      .get(`${this.config.apiURL}/api/1.0/artists/search?name_entry=${query}&limit=5`)
-      .map((response: any) => {
-        console.log('Search response: ', response);
-        return response.map(mapToArtist);
-      });
+    .post(`${this.config.apiURL}/graphql`, {
+      query: "query ArtistsByNameEntry($nameEntry: String, $limit: Long) { artistsByNameEntry(nameEntry: $nameEntry, limit: $limit){id, name} }",
+      variables: {
+        nameEntry: query,
+        limit: 5
+      }
+    })
+    .map((response: any) => {
+      console.log('Search response: ', response);
+      return response.data.artistsByNameEntry.map(mapToArtist);
+    });
   }
 
   createNewAlbum(album: Album): Promise<Album> {
     return this.http
-      .post(`${this.config.apiURL}${AlbumService.SERVICE_URL}/`, mapToAlbumRequest(album))
-      .map((response: any) => {
-        console.log('Creation response: ', response);
-        return mapToAlbum(response);
-      })
-      .toPromise()
+    .post(`${this.config.apiURL}/graphql`, {
+      query: "mutation Album($album: AlbumInput!) { createAlbum(album: $album){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}} }",
+      variables: {
+        album: mapToAlbumRequest(album)
+      }
+    })
+    .map((response: any) => {
+      console.log('Creation response: ', response);
+      return mapToAlbum(response.data.createAlbum);
+    })
+    .toPromise()
   }
 
   updateAlbum(album: Album): Promise<Album> {
     return this.http
-      .put(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${album.id}`, mapToAlbumRequest(album))
-      .map((response: any) => {
-        console.log('Updated response: ', response);
-        return mapToAlbum(response);
-      })
-      .toPromise();
+    .post(`${this.config.apiURL}/graphql`, {
+      query: "mutation Album($album: AlbumInput!) { updateAlbum(album: $album){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}} }",
+      variables: {
+        // _id: album.id,
+        album: mapToAlbumRequest(album)
+      }
+    })
+    .map((response: any) => {
+      console.log('Updated response: ', response);
+      return mapToAlbum(response.data.updateAlbum);
+    })
+    .toPromise();
   }
 
   deleteAlbum(album: Album): Promise<void> {
-    return this.http.delete(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${album.id}`)
-      .map(() => {
+    return this.http.post(`${this.config.apiURL}/graphql`,
+      {
+        query: "mutation Album($id: String!) { deleteAlbum(id: $id) }",
+        variables: {
+          id: album.id
+        }
       })
-      .toPromise()
+    .map(() => {
+    })
+    .toPromise()
   }
 
   getRecommendedForAlbum(album: Album): Observable<Array<Album>> {
     return this.http
-      .get(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${album.id}/recommended?limit=4`)
-      .map((response: any) => {
-        console.log('Search response: ', response);
-        return response.map(mapToAlbum);
-      });
+    .post(`${this.config.apiURL}/graphql`, {
+      query: "query AlbumsRecommended($albumId: String, $limit: Int) { albumsRecommended(albumId: $albumId, limit: $limit){id, name, slug, coverImageUrl} }",
+      variables: {
+        albumId: album.id,
+        limit: 4
+      }
+    })
+    .map((response: any) => {
+      console.log('Search response: ', response);
+      return response.data.albumsRecommended.map(mapToAlbum);
+    });
   }
 
-  changeRating(album: Album, rating: number):Promise<any> {
+  changeRating(album: Album, rating: number): Promise<any> {
     return this.http
-      .put(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${album.id}/rating`, {rating})
-      .toPromise();
+    .post(`${this.config.apiURL}/graphql`, {
+      query: "mutation ChangeRating($albumId: String!, $rating: Float!) { changeAlbumRating(albumId: $albumId, rating: $rating) }",
+      variables: {
+        albumId: album.id,
+        rating: rating
+      }
+    })
+    .map((response: any) => {
+      return response.data.changeAlbumRating;
+    })
+    .toPromise();
   }
 }

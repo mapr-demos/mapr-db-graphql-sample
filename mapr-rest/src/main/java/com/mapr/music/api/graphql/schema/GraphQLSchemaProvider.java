@@ -6,10 +6,9 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
-
-import javax.inject.Inject;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import javax.inject.Inject;
 
 public class GraphQLSchemaProvider {
 
@@ -21,8 +20,8 @@ public class GraphQLSchemaProvider {
 
   @Inject
   public GraphQLSchemaProvider(AlbumDataFetcher albumDataFetcher,
-                               ArtistDataFetcher artistDataFetcher,
-                               UserDataFetcher userDataFetcher) {
+      ArtistDataFetcher artistDataFetcher,
+      UserDataFetcher userDataFetcher) {
 
     this.albumDataFetcher = albumDataFetcher;
     this.artistDataFetcher = artistDataFetcher;
@@ -40,28 +39,46 @@ public class GraphQLSchemaProvider {
 
   private RuntimeWiring buildRuntimeWiring() {
     return RuntimeWiring.newRuntimeWiring()
-      .type("Query", typeWiring -> typeWiring
-        .dataFetcher("currentUser", userDataFetcher.currentUser())
-        .dataFetcher("album", albumDataFetcher.album())
-        .dataFetcher("albums", albumDataFetcher.albums())
-        .dataFetcher("artist", artistDataFetcher.artist())
-        .dataFetcher("artists", artistDataFetcher.artists())
-      )
-      .type("Mutation", typeWiring -> typeWiring
-        .dataFetcher("createAlbum", albumDataFetcher.createAlbum())
-        .dataFetcher("updateAlbum", albumDataFetcher.updateAlbum())
-        .dataFetcher("deleteAlbum", albumDataFetcher.deleteAlbum())
-        .dataFetcher("createArtist", artistDataFetcher.createArtist())
-        .dataFetcher("updateArtist", artistDataFetcher.updateArtist())
-        .dataFetcher("deleteArtist", artistDataFetcher.deleteArtist())
-      )
-      .type("Album", typeWiring -> typeWiring
-        .dataFetcher("artists", albumDataFetcher.artists())
-      )
-      .type("Artist", typeWiring -> typeWiring
-        .dataFetcher("albums", artistDataFetcher.albums())
-      )
-      .build();
+        .type("Query", typeWiring -> typeWiring
+            .dataFetcher("currentUser", userDataFetcher.currentUser())
+
+            // Album
+            .dataFetcher("album", albumDataFetcher.album())
+            .dataFetcher("albumBySlug", albumDataFetcher.albumBySlug())
+            .dataFetcher("albums", albumDataFetcher.albums())
+            .dataFetcher("albumsRecommended", albumDataFetcher.albumsRecommended())
+            .dataFetcher("totalAlbums", albumDataFetcher.totalAlbums())
+
+            // Artist
+            .dataFetcher("artist", artistDataFetcher.artist())
+            .dataFetcher("artists", artistDataFetcher.artists())
+            .dataFetcher("artistsByNameEntry", artistDataFetcher.artistsByNameEntry())
+            .dataFetcher("totalArtists", artistDataFetcher.totalArtists())
+        )
+        .type("Mutation", typeWiring -> typeWiring
+
+            // Album
+            .dataFetcher("createAlbum", albumDataFetcher.createAlbum())
+            .dataFetcher("updateAlbum", albumDataFetcher.updateAlbum())
+            .dataFetcher("deleteAlbum", albumDataFetcher.deleteAlbum())
+            .dataFetcher("deleteTrackInAlbum", albumDataFetcher.deleteTrackInAlbum())
+            .dataFetcher("saveAlbumTracks", albumDataFetcher.saveAlbumTracks())
+            .dataFetcher("updateAlbumTrack", albumDataFetcher.updateAlbumTrack())
+            .dataFetcher("addTrackToAlbum", albumDataFetcher.addTrackToAlbum())
+            .dataFetcher("changeAlbumRating", albumDataFetcher.changeAlbumRating())
+
+            // Artist
+            .dataFetcher("createArtist", artistDataFetcher.createArtist())
+            .dataFetcher("updateArtist", artistDataFetcher.updateArtist())
+            .dataFetcher("deleteArtist", artistDataFetcher.deleteArtist())
+        )
+        .type("Album", typeWiring -> typeWiring
+            .dataFetcher("artists", albumDataFetcher.artists())
+        )
+        .type("Artist", typeWiring -> typeWiring
+            .dataFetcher("albums", artistDataFetcher.albums())
+        )
+        .build();
   }
 
 }

@@ -7,10 +7,9 @@ import graphql.GraphQLError;
 import graphql.servlet.DefaultGraphQLErrorHandler;
 import graphql.servlet.GraphQLErrorHandler;
 import graphql.servlet.SimpleGraphQLServlet;
-
-import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 
 public class GraphQLEndpoint extends SimpleGraphQLServlet {
 
@@ -26,9 +25,10 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
       @Override
       protected List<GraphQLError> filterGraphQLErrors(List<GraphQLError> errors) {
         return errors.stream()
-          .filter(e -> e instanceof ExceptionWhileDataFetching || super.isClientError(e))
-          .map(e -> e instanceof ExceptionWhileDataFetching ? new GraphQLErrorWrapper((ExceptionWhileDataFetching) e) : e)
-          .collect(Collectors.toList());
+            .filter(e -> e instanceof ExceptionWhileDataFetching || super.isClientError(e))
+            .map(e -> e instanceof ExceptionWhileDataFetching ? new GraphQLErrorWrapper((ExceptionWhileDataFetching) e)
+                : e)
+            .collect(Collectors.toList());
       }
     };
   }

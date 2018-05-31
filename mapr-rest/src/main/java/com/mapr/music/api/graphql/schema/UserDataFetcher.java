@@ -3,10 +3,9 @@ package com.mapr.music.api.graphql.schema;
 import com.mapr.music.api.graphql.errors.GraphQLUnauthorizedError;
 import com.mapr.music.service.UserService;
 import graphql.schema.DataFetcher;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-
-import javax.inject.Inject;
 import java.security.Principal;
+import javax.inject.Inject;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 public class UserDataFetcher {
 

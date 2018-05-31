@@ -30,6 +30,7 @@ export class AlbumDetailPage implements OnInit {
               private router: Router) {
     this.isAuthenticated = this.authService.isAuthenticated$;
   }
+
   currentRate = 0;
 
   album: Album;
@@ -115,30 +116,30 @@ export class AlbumDetailPage implements OnInit {
 
   deleteAlbum() {
     this.albumService.deleteAlbum(this.album)
-      .then(() => {
-        this.router.navigateByUrl('');
-      });
+    .then(() => {
+      this.router.navigateByUrl('');
+    });
   }
 
   ngOnInit(): void {
     this.activatedRoute.paramMap
-      .switchMap((params: ParamMap) => {
-        const albumSlug = params.get('albumSlug');
-        this.sourceURL = this.albumService.getAlbumBySlugURL(albumSlug);
-        return this.albumService.getAlbumBySlug(albumSlug);
-      })
-      .subscribe((album) => {
-        this.album = album;
-        this.albumService.getRecommendedForAlbum(album).subscribe((recommended) => {
-          this.recommendedAlbums = recommended;
-        });
+    .switchMap((params: ParamMap) => {
+      const albumSlug = params.get('albumSlug');
+      this.sourceURL = this.albumService.getAlbumBySlugURL(albumSlug);
+      return this.albumService.getAlbumBySlug(albumSlug);
+    })
+    .subscribe((album) => {
+      this.album = album;
+      this.albumService.getRecommendedForAlbum(album).subscribe((recommended) => {
+        this.recommendedAlbums = recommended;
       });
+    });
   }
 
   changeRating() {
     this.albumService.changeRating(this.album, this.currentRate)
-      .then(({rating}) => {
-        this.album.rating = rating;
-      });
+    .then((rating) => {
+      this.album.rating = rating;
+    });
   }
 }
