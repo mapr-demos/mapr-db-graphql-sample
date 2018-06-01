@@ -35,10 +35,7 @@ public class MaprMusicApp extends Application {
     public Set<Class<?>> getClasses() {
 
         Set<Class<?>> resources = new HashSet<>();
-        resources.add(AlbumEndpoint.class);
-        resources.add(ArtistEndpoint.class);
         resources.add(LanguageEndpoint.class);
-        resources.add(UserEndpoint.class);
         resources.add(SearchEndpoint.class);
         resources.add(ReportingEndpoint.class);
         resources.add(StatisticsEndpoint.class);
