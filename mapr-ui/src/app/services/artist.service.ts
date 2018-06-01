@@ -9,30 +9,30 @@ import {Observable} from "rxjs/Observable";
 
 const PAGE_SIZE = 12;
 
-function mapToArtist({_id, name, profile_image_url, gender, slug, area, disambiguation_comment, begin_date, end_date, IPI, ISNI, rating}): Artist {
+function mapToArtist({id, name, profileImageUrl, gender, slug, area, disambiguation_comment, begin_date, end_date, ipi, isni, rating}): Artist {
   return {
-    id: _id,
+    id,
     name,
     gender,
-    avatarURL: profile_image_url,
+    avatarURL: profileImageUrl,
     slug,
     area,
     disambiguationComment: disambiguation_comment,
     beginDate: (begin_date) ? new Date(begin_date).toDateString() : null,
     endDate: (end_date) ? new Date(end_date).toDateString() : null,
-    IPI,
-    ISNI,
+    ipi,
+    isni,
     rating,
     albums: []
   }
 }
 
-function mapToAlbum({_id, name, cover_image_url, slug}): Album {
+function mapToAlbum({id, name, coverImageUrl, slug}): Album {
   return {
-    id: _id,
+    id,
     title: name,
     slug,
-    coverImageURL: cover_image_url
+    coverImageURL: coverImageUrl
   };
 }
 
@@ -44,11 +44,12 @@ const mapToAlbumRequest = ({
                            }: Album) => ({
   _id: id,
   name: title,
-  slug,
-  cover_image_url: coverImageURL
+  // slug,
+  coverImageUrl: coverImageURL
 });
 
 const mapToArtistRequest = ({
+                              id,
                               name,
                               avatarURL,
                               gender,
@@ -57,20 +58,21 @@ const mapToArtistRequest = ({
                               endDate,
                               slug,
                               disambiguationComment,
-                              IPI,
-                              ISNI,
+                              ipi,
+                              isni,
                               albums
                             }: Artist) => ({
+  _id: id,
   name: name,
-  profile_image_url: avatarURL,
+  profileImageUrl: avatarURL,
   area,
-  begin_date: (beginDate) ? Date.parse(beginDate) : null,
-  end_date: (endDate) ? Date.parse(endDate) : null,
-  slug,
+  // begin_date: (beginDate) ? Date.parse(beginDate) : null,
+  // end_date: (endDate) ? Date.parse(endDate) : null,
+  // slug,
   gender,
-  disambiguation_comment: disambiguationComment,
-  IPI,
-  ISNI,
+  disambiguationComment,
+  ipi,
+  isni,
   albums: albums.map(mapToAlbumRequest)
 });
 
@@ -87,17 +89,23 @@ export class ArtistService {
     return `${this.config.apiURL}${ArtistService.SERVICE_URL}/${artistId}`;
   }
 
+  // TODO
   getArtistById(artistId: string): Promise<Artist> {
-    return this.http.get(this.getArtistByIdURL(artistId))
-      .map((response: any) => {
-        console.log('Artist: ', response);
-        const artist = mapToArtist(response);
-        artist.albums = response.albums
-          ? response.albums.map(mapToAlbum)
-          : [];
-        return artist;
-      })
-      .toPromise();
+    return this.http.post(`${this.config.apiURL}/graphql`, {
+      query: "query Artist($id: String) { artist(id: $id){id, name, gender, ipi, isni, area, profileImageUrl, slug, rating, albums {id, name, coverImageUrl} }}",
+      variables: {
+        id: artistId
+      }
+    })
+    .map((response: any) => {
+      console.log('Artist: ', response);
+      const artist = mapToArtist(response.data.artist);
+      artist.albums = response.data.artist.albums
+        ? response.data.artist.albums.map(mapToAlbum)
+        : [];
+      return artist;
+    })
+    .toPromise();
   }
 
   getArtistPageURL(pageNum: number): string {
@@ -108,15 +116,21 @@ export class ArtistService {
    * @desc get albums page from server side
    * */
   getArtistPage(pageNum: number): Promise<ArtistsPage> {
-    return this.http.get(this.getArtistPageURL(pageNum))
-      .map((response: any) => {
-        const artists = response.results.map(mapToArtist);
-        return {
-          artists,
-          totalNumber: response.pagination.items
-        };
-      })
-      .toPromise();
+    return this.http.post(`${this.config.apiURL}/graphql`, {
+      query: "query Artists($offset: Int, $limit: Int) { artists(offset: $offset, limit: $limit){name, profileImageUrl, slug }, totalArtists }",
+      variables: {
+        offset: (pageNum - 1) * PAGE_SIZE,
+        limit: PAGE_SIZE
+      }
+    })
+    .map((response: any) => {
+      const artists = response.data.artists.map(mapToArtist);
+      return {
+        artists,
+        totalNumber: response.data.totalArtists
+      };
+    })
+    .toPromise();
   }
 
   /**
@@ -130,66 +144,107 @@ export class ArtistService {
    * @desc get album by slug from server side
    * */
   getArtistBySlug(artistSlug: string): Promise<Artist> {
-    return this.http.get(this.getArtistBySlugURL(artistSlug))
-      .map((response: any) => {
-        console.log('Artist: ', response);
-        const artist = mapToArtist(response);
-        artist.albums = response.albums
-          ? response.albums.map(mapToAlbum)
-          : [];
-        return artist;
-      })
-      .toPromise();
+    return this.http.post(`${this.config.apiURL}/graphql`, {
+      query: "query ArtistBySlug($slug: String) { artistBySlug(slug: $slug){id, name, gender, ipi, isni, area, profileImageUrl, slug, rating, albums {id, name, coverImageUrl} }}",
+      variables: {
+        slug: artistSlug
+      }
+    })
+    .map((response: any) => {
+      console.log('Artist: ', response);
+      const artist = mapToArtist(response.data.artistBySlug);
+      artist.albums = response.data.artistBySlug.albums
+        ? response.data.artistBySlug.albums.map(mapToAlbum)
+        : [];
+      return artist;
+    })
+    .toPromise();
   }
 
   deleteArtist(artist: Artist): Promise<void> {
-    return this.http.delete(`${this.config.apiURL}${ArtistService.SERVICE_URL}/${artist.id}`)
-      .map(() => {
-      })
-      .toPromise()
+    return this.http.post(`${this.config.apiURL}/graphql`, {
+      query: "mutation Artist($id: String!) { deleteArtist(id: $id) }",
+      variables: {
+        id: artist.id
+      }
+    })
+    .map(() => {
+    })
+    .toPromise()
   }
 
   searchForAlbums(query: string): Observable<Array<Album>> {
     return this.http
-      .get(`${this.config.apiURL}/api/1.0/albums/search?name_entry=${query}&limit=5`)
-      .map((response: any) => {
-        console.log('Search response: ', response);
-        return response.map(mapToAlbum);
-      });
+    .post(`${this.config.apiURL}/graphql`, {
+      query: "query AlbumsByNameEntry($nameEntry: String, $limit: Long) { albumsByNameEntry(nameEntry: $nameEntry, limit: $limit){id, name} }",
+      variables: {
+        nameEntry: query,
+        limit: 5
+      }
+    })
+    .map((response: any) => {
+      console.log('Search response: ', response);
+      return response.data.albumsByNameEntry.map(mapToAlbum);
+    });
   }
 
   createNewArtist(artist: Artist): Promise<Artist> {
     return this.http
-      .post(`${this.config.apiURL}${ArtistService.SERVICE_URL}/`, mapToArtistRequest(artist))
-      .map((response: any) => {
-        console.log('Creation response: ', response);
-        return mapToArtist(response);
-      })
-      .toPromise()
+    .post(`${this.config.apiURL}/graphql`, {
+      query: "mutation Artist($artist: ArtistInput!) { createArtist(artist: $artist){id, name, profileImageUrl, slug, rating, albums {id, name, coverImageUrl} }}",
+      variables: {
+        artist: mapToArtistRequest(artist)
+      }
+    })
+    .map((response: any) => {
+      console.log('Creation response: ', response);
+      return mapToArtist(response.data.createArtist);
+    })
+    .toPromise()
   }
 
   updateArtist(artist: Artist): Promise<Artist> {
     return this.http
-      .put(`${this.config.apiURL}${ArtistService.SERVICE_URL}/${artist.id}`, mapToArtistRequest(artist))
-      .map((response: any) => {
-        console.log('Updated response: ', response);
-        return mapToArtist(response);
-      })
-      .toPromise();
+    .post(`${this.config.apiURL}/graphql`, {
+      query: "mutation UpdateArtist($artist: ArtistInput!) { updateArtist(artist: $artist){id, name, profileImageUrl, slug, rating, albums {id, name, coverImageUrl} }}",
+      variables: {
+        artist: mapToArtistRequest(artist)
+      }
+    })
+    .map((response: any) => {
+      console.log('Updated response: ', response);
+      return mapToArtist(response.data.updateArtist);
+    })
+    .toPromise();
   }
 
   getRecommendedForArtist(artist: Artist): Observable<Array<Artist>> {
     return this.http
-      .get(`${this.config.apiURL}${ArtistService.SERVICE_URL}/${artist.id}/recommended?limit=4`)
-      .map((response: any) => {
-        console.log('Search response: ', response);
-        return response.map(mapToArtist);
-      });
+    .post(`${this.config.apiURL}/graphql`, {
+      query: "query ArtistsRecommended($artistId: String, $limit: Int) { artistsRecommended(artistId: $artistId, limit: $limit){id, name, slug, profileImageUrl} }",
+      variables: {
+        artistId: artist.id,
+        limit: 4
+      }
+    })
+    .map((response: any) => {
+      console.log('Search response: ', response);
+      return response.data.artistsRecommended.map(mapToArtist);
+    });
   }
 
-  changeRating(artist: Artist, rating: number):Promise<any> {
+  changeRating(artist: Artist, rating: number): Promise<any> {
     return this.http
-      .put(`${this.config.apiURL}${ArtistService.SERVICE_URL}/${artist.id}/rating`, {rating})
-      .toPromise();
+    .post(`${this.config.apiURL}/graphql`, {
+      query: "mutation ChangeArtistRating($artistId: String!, $rating: Float!) { changeArtistRating(artistId: $artistId, rating: $rating) }",
+      variables: {
+        artistId: artist.id,
+        rating: rating
+      }
+    })
+    .map((response: any) => {
+      return response.data.changeArtistRating;
+    })
+    .toPromise();
   }
 }

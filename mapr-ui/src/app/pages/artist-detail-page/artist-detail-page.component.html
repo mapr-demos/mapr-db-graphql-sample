@@ -19,8 +19,8 @@
             <div *ngIf="artist.area" style="padding-top: 5px">Area: {{artist.area}}</div>
             <div *ngIf="artist.beginDate" style="padding-top: 5px">Begin date: {{artist.beginDate}}</div>
             <div *ngIf="artist.endDate" style="padding-top: 5px">End date: {{artist.endDate}}</div>
-            <div *ngIf="artist.IPI" style="padding-top: 5px">IPI: {{artist.IPI}}</div>
-            <div *ngIf="artist.ISNI" style="padding-top: 5px">ISNI: {{artist.ISNI}}</div>
+            <div *ngIf="artist.IPI" style="padding-top: 5px">IPI: {{artist.ipi}}</div>
+            <div *ngIf="artist.ISNI" style="padding-top: 5px">ISNI: {{artist.isni}}</div>
             <div>
               <ngb-rating [(rate)]="artist.rating" max="5" style="outline: none">
                 <ng-template let-fill="fill">

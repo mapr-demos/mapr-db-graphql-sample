@@ -3,10 +3,9 @@ package com.mapr.music.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
+import javax.validation.constraints.NotNull;
 
 /**
  * Data Transfer Object for {@link com.mapr.music.model.Artist} model class.
@@ -26,25 +25,25 @@ public class ArtistDto {
     @JsonProperty("slug")
     private String slug;
 
-    @JsonProperty("IPI")
+    @JsonProperty("ipi")
     private String ipi;
 
-    @JsonProperty("ISNI")
+    @JsonProperty("isni")
     private String isni;
 
     @JsonProperty("MBID")
     private String mbid;
 
-    @JsonProperty("disambiguation_comment")
+    @JsonProperty("disambiguationComment")
     private String disambiguationComment;
 
     @JsonProperty("albums")
     private List<AlbumDto> albums;
 
-    @JsonProperty("profile_image_url")
+    @JsonProperty("profileImageUrl")
     private String profileImageUrl;
 
-    @JsonProperty("images_urls")
+    @JsonProperty("imagesUrls")
     private List<String> imagesUrls;
 
     @JsonProperty("begin_date")

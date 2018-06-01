@@ -28,23 +28,23 @@ export class AlbumEditForm implements OnInit {
 
   ngOnInit(): void {
     this.languageService.getAllLanguages()
-      .then((languages) => {
-        this.languageOptions = languages;
-      });
+    .then((languages) => {
+      this.languageOptions = languages;
+    });
     console.log(this.album.releasedDate);
     $('#date-selector')
-      .datetimepicker({
-        format: 'MM/DD/YYYY',
-        maxDate: Date.now(),
-        defaultDate: this.album.releasedDate,
-        useCurrent: false
-      })
-      .on('dp.hide', (event) => {
-        // ignoring client timezone
-        var clientDate = event.date.toDate();
-        var gmtTimestamp = clientDate.valueOf() - clientDate.getTimezoneOffset() * 60000;
-        this.album.releasedDate = new Date(gmtTimestamp);
-      });
+    .datetimepicker({
+      format: 'MM/DD/YYYY',
+      maxDate: Date.now(),
+      defaultDate: this.album.releasedDate,
+      useCurrent: false
+    })
+    .on('dp.hide', (event) => {
+      // ignoring client timezone
+      var clientDate = event.date.toDate();
+      var gmtTimestamp = clientDate.valueOf() - clientDate.getTimezoneOffset() * 60000;
+      this.album.releasedDate = new Date(gmtTimestamp);
+    });
     $('#new-artist').typeahead({
       source: this.getArtists.bind(this),
       fitToElement: true,
@@ -59,10 +59,10 @@ export class AlbumEditForm implements OnInit {
       this.artistsDisposable.unsubscribe();
     }
     this.artistsDisposable = this.albumService.searchForArtists(query)
-      .subscribe((artists) => {
-        cb(artists)
-        this.artistsDisposable = null;
-      });
+    .subscribe((artists) => {
+      cb(artists)
+      this.artistsDisposable = null;
+    });
   }
 
   removeArtistById(artistId: string) {
@@ -72,9 +72,9 @@ export class AlbumEditForm implements OnInit {
   afterSelect(item) {
     $('#new-artist').typeahead('destroy');
     $('#new-artist')
-      .val('')
-      .text('')
-      .change();
+    .val('')
+    .text('')
+    .change();
     $('#new-artist').typeahead({
       source: this.getArtists.bind(this),
       fitToElement: true,

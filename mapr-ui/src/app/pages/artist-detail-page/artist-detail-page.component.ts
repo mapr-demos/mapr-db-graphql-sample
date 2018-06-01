@@ -52,7 +52,7 @@ export class ArtistPage implements OnInit {
   }
   changeRating() {
     this.artistService.changeRating(this.artist, this.currentRate)
-      .then(({rating}) => {
+      .then((rating) => {
         this.artist.rating = rating;
       });
   }

@@ -47,12 +47,15 @@ public class GraphQLSchemaProvider {
             .dataFetcher("albumBySlug", albumDataFetcher.albumBySlug())
             .dataFetcher("albums", albumDataFetcher.albums())
             .dataFetcher("albumsRecommended", albumDataFetcher.albumsRecommended())
+            .dataFetcher("albumsByNameEntry", albumDataFetcher.albumsByNameEntry())
             .dataFetcher("totalAlbums", albumDataFetcher.totalAlbums())
 
             // Artist
             .dataFetcher("artist", artistDataFetcher.artist())
+            .dataFetcher("artistBySlug", artistDataFetcher.artistBySlug())
             .dataFetcher("artists", artistDataFetcher.artists())
             .dataFetcher("artistsByNameEntry", artistDataFetcher.artistsByNameEntry())
+            .dataFetcher("artistsRecommended", artistDataFetcher.artistsRecommended())
             .dataFetcher("totalArtists", artistDataFetcher.totalArtists())
         )
         .type("Mutation", typeWiring -> typeWiring
@@ -71,6 +74,7 @@ public class GraphQLSchemaProvider {
             .dataFetcher("createArtist", artistDataFetcher.createArtist())
             .dataFetcher("updateArtist", artistDataFetcher.updateArtist())
             .dataFetcher("deleteArtist", artistDataFetcher.deleteArtist())
+            .dataFetcher("changeArtistRating", artistDataFetcher.changeArtistRating())
         )
         .type("Album", typeWiring -> typeWiring
             .dataFetcher("artists", albumDataFetcher.artists())

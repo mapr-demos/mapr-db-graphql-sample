@@ -16,8 +16,8 @@ export interface Artist {
   beginDate: string,
   endDate: string,
   rating: number,
-  IPI,
-  ISNI
+  ipi,
+  isni
   albums: Array<Album>
 }
 

@@ -14,9 +14,9 @@ const createNewArtist = (): Artist => ({
   endDate: '',
   albums: [],
   disambiguationComment: '',
-  IPI: '',
+  ipi: '',
   rating: 0,
-  ISNI: ''
+  isni: ''
 });
 
 @Component({

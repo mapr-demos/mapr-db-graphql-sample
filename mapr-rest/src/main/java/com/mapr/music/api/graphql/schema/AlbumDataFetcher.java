@@ -74,6 +74,14 @@ public class AlbumDataFetcher {
     };
   }
 
+  public DataFetcher albumsByNameEntry() {
+    return (env) -> {
+      String nameEntry = env.getArgument("nameEntry");
+      Long limit = env.getArgument("limit");
+      return albumService.searchAlbums(nameEntry, limit);
+    };
+  }
+
   public DataFetcher totalAlbums() {
     return (env) -> albumService.getTotalNum();
   }
