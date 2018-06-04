@@ -18,17 +18,20 @@ public class GraphQLSchemaProvider {
   private final ArtistDataFetcher artistDataFetcher;
   private final UserDataFetcher userDataFetcher;
   private final LanguageDataFetcher languageDataFetcher;
+  private final SearchDataFetcher searchDataFetcher;
 
   @Inject
   public GraphQLSchemaProvider(AlbumDataFetcher albumDataFetcher,
       ArtistDataFetcher artistDataFetcher,
       UserDataFetcher userDataFetcher,
-      LanguageDataFetcher languageDataFetcher) {
+      LanguageDataFetcher languageDataFetcher,
+      SearchDataFetcher searchDataFetcher) {
 
     this.albumDataFetcher = albumDataFetcher;
     this.artistDataFetcher = artistDataFetcher;
     this.userDataFetcher = userDataFetcher;
     this.languageDataFetcher = languageDataFetcher;
+    this.searchDataFetcher = searchDataFetcher;
   }
 
   public GraphQLSchema schema() {
@@ -62,6 +65,11 @@ public class GraphQLSchemaProvider {
             .dataFetcher("totalArtists", artistDataFetcher.totalArtists())
 
             .dataFetcher("languages", languageDataFetcher.languages())
+
+            // Search
+            .dataFetcher("findByNameEntry", searchDataFetcher.findByNameEntry())
+            .dataFetcher("findArtistsByNameEntry", searchDataFetcher.findArtistsByNameEntry())
+            .dataFetcher("findAlbumsByNameEntry", searchDataFetcher.findAlbumsByNameEntry())
         )
         .type("Mutation", typeWiring -> typeWiring
 

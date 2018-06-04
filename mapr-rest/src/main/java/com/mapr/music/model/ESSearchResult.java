@@ -18,7 +18,7 @@ public class ESSearchResult {
     private String name;
 
     @JsonProperty("image_url")
-    private String imageURL;
+    private String imageUrl;
 
     @JsonProperty("slug")
     private String slug;
@@ -47,12 +47,12 @@ public class ESSearchResult {
         this.name = name;
     }
 
-    public String getImageURL() {
-        return imageURL;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setImageURL(String imageURL) {
-        this.imageURL = imageURL;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public String getSlug() {

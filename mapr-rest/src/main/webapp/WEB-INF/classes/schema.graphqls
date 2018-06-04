@@ -22,9 +22,15 @@ type Query {
   totalArtists: Long
 
   # User queries
-  currentUser : User
+  currentUser: User
 
-  languages : [Language]
+  languages: [Language]
+
+  # Search queries
+  findByNameEntry(nameEntry: String, perPage: Int, page: Int): PaginatedSearchResult
+  findAlbumsByNameEntry(nameEntry: String, perPage: Int, page: Int): PaginatedSearchResult
+  findArtistsByNameEntry(nameEntry: String, perPage: Int, page: Int): PaginatedSearchResult
+
 }
 
 type Mutation {
@@ -33,10 +39,10 @@ type Mutation {
   createAlbum(album: AlbumInput!): Album
   updateAlbum(album: AlbumInput!): Album
   deleteAlbum(id: String!): Boolean
-  deleteTrackInAlbum(albumId: String, trackId: String) : Album
-  saveAlbumTracks(albumId: String, tracks: [TrackInput]) : Album
-  updateAlbumTrack(albumId: String, track: TrackInput) : Album
-  addTrackToAlbum(albumId: String, track: TrackInput) : Track
+  deleteTrackInAlbum(albumId: String, trackId: String): Album
+  saveAlbumTracks(albumId: String, tracks: [TrackInput]): Album
+  updateAlbumTrack(albumId: String, track: TrackInput): Album
+  addTrackToAlbum(albumId: String, track: TrackInput): Track
   changeAlbumRating(albumId: String!, rating: Float!): Float
 
   # Artists mutations
@@ -100,6 +106,26 @@ type User {
 type Language {
   id: String
   name: String
+}
+
+type PaginatedSearchResult {
+  pagination: Pagination
+  results: [SearchResult]
+}
+
+type Pagination {
+  perPage: Long
+  items: Long
+  page: Long
+  pages: Long
+}
+
+type SearchResult {
+  id: String
+  name: String
+  type: String
+  imageUrl: String
+  slug: String
 }
 
 input AlbumInput {

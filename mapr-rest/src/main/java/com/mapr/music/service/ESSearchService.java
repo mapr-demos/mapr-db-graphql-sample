@@ -188,7 +188,7 @@ public class ESSearchService implements PaginatedService {
                 return result;
             }
 
-            result.setImageURL(artist.getProfileImageUrl());
+            result.setImageUrl(artist.getProfileImageUrl());
 
             String artistSlug = SlugService.constructSlugString(artist.getSlugName(), artist.getSlugPostfix());
             result.setSlug(artistSlug);
@@ -200,7 +200,7 @@ public class ESSearchService implements PaginatedService {
                 return result;
             }
 
-            result.setImageURL(album.getCoverImageUrl());
+            result.setImageUrl(album.getCoverImageUrl());
 
             String albumSlug = SlugService.constructSlugString(album.getSlugName(), album.getSlugPostfix());
             result.setSlug(albumSlug);
