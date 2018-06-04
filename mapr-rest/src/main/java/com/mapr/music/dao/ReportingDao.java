@@ -81,7 +81,7 @@ public class ReportingDao {
      * @throws SQLException
      */
     private Connection getConnection() throws SQLException {
-        if (connection == null) {
+        if (connection == null || connection.isClosed()) {
             connection = ds.getConnection();
         }
         return connection;

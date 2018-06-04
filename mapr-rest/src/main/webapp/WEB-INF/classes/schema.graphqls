@@ -31,6 +31,10 @@ type Query {
   findAlbumsByNameEntry(nameEntry: String, perPage: Int, page: Int): PaginatedSearchResult
   findArtistsByNameEntry(nameEntry: String, perPage: Int, page: Int): PaginatedSearchResult
 
+  # Reporting queries
+  getTopArtistByArea(count: Int): [Pair]
+  getTopLanguagesForAlbum(count: Int): [Pair]
+  getNumberOfAlbumsPerYear(count: Int): [Pair]
 }
 
 type Mutation {
@@ -51,6 +55,7 @@ type Mutation {
   deleteArtist(id: String!): Boolean
   changeArtistRating(artistId: String!, rating: Float!): Float
 
+  recomputeStatistics: Boolean
 }
 
 type Album {
@@ -126,6 +131,11 @@ type SearchResult {
   type: String
   imageUrl: String
   slug: String
+}
+
+type Pair {
+  key: String
+  value: String
 }
 
 input AlbumInput {

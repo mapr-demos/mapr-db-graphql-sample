@@ -19,19 +19,25 @@ public class GraphQLSchemaProvider {
   private final UserDataFetcher userDataFetcher;
   private final LanguageDataFetcher languageDataFetcher;
   private final SearchDataFetcher searchDataFetcher;
+  private final StatisticsDataFetcher statisticsDataFetcher;
+  private final ReportingDataFetcher reportingDataFetcher;
 
   @Inject
   public GraphQLSchemaProvider(AlbumDataFetcher albumDataFetcher,
       ArtistDataFetcher artistDataFetcher,
       UserDataFetcher userDataFetcher,
       LanguageDataFetcher languageDataFetcher,
-      SearchDataFetcher searchDataFetcher) {
+      SearchDataFetcher searchDataFetcher,
+      StatisticsDataFetcher statisticsDataFetcher,
+      ReportingDataFetcher reportingDataFetcher) {
 
     this.albumDataFetcher = albumDataFetcher;
     this.artistDataFetcher = artistDataFetcher;
     this.userDataFetcher = userDataFetcher;
     this.languageDataFetcher = languageDataFetcher;
     this.searchDataFetcher = searchDataFetcher;
+    this.statisticsDataFetcher = statisticsDataFetcher;
+    this.reportingDataFetcher = reportingDataFetcher;
   }
 
   public GraphQLSchema schema() {
@@ -70,6 +76,11 @@ public class GraphQLSchemaProvider {
             .dataFetcher("findByNameEntry", searchDataFetcher.findByNameEntry())
             .dataFetcher("findArtistsByNameEntry", searchDataFetcher.findArtistsByNameEntry())
             .dataFetcher("findAlbumsByNameEntry", searchDataFetcher.findAlbumsByNameEntry())
+
+            // reporting
+            .dataFetcher("getTopArtistByArea", reportingDataFetcher.getTopArtistByArea())
+            .dataFetcher("getTopLanguagesForAlbum", reportingDataFetcher.getTopLanguagesForAlbum())
+            .dataFetcher("getNumberOfAlbumsPerYear", reportingDataFetcher.getNumberOfAlbumsPerYear())
         )
         .type("Mutation", typeWiring -> typeWiring
 
@@ -88,6 +99,8 @@ public class GraphQLSchemaProvider {
             .dataFetcher("updateArtist", artistDataFetcher.updateArtist())
             .dataFetcher("deleteArtist", artistDataFetcher.deleteArtist())
             .dataFetcher("changeArtistRating", artistDataFetcher.changeArtistRating())
+
+            .dataFetcher("recomputeStatistics", statisticsDataFetcher.recomputeStatistics())
         )
         .type("Album", typeWiring -> typeWiring
             .dataFetcher("artists", albumDataFetcher.artists())
