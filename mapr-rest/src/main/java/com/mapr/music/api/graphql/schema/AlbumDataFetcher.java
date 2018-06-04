@@ -62,10 +62,6 @@ public class AlbumDataFetcher {
   public DataFetcher albumsRecommended() {
     return (env) -> {
 
-      if (!isAuthenticated()) {
-        throw new GraphQLUnauthorizedError();
-      }
-
       Principal principal = ResteasyProviderFactory.getContextData(Principal.class);
       String albumId = env.getArgument("albumId");
       Integer limit = env.getArgument("limit");

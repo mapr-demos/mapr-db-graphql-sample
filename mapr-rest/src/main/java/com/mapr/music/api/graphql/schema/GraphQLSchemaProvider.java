@@ -51,6 +51,7 @@ public class GraphQLSchemaProvider {
 
   private RuntimeWiring buildRuntimeWiring() {
     return RuntimeWiring.newRuntimeWiring()
+        .scalar(DateScalar.DATE)
         .type("Query", typeWiring -> typeWiring
             .dataFetcher("currentUser", userDataFetcher.currentUser())
 

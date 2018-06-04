@@ -76,6 +76,7 @@ type Album {
   country: String
   slug: String
   rating: Float
+  releasedDateDay: Date
 }
 
 type Artist {
@@ -92,6 +93,8 @@ type Artist {
   slug: String
   ipi: String
   isni: String
+  beginDateDay: Date
+  endDateDay: Date
 }
 
 type Track {
@@ -153,6 +156,7 @@ input AlbumInput {
   coverImageUrl: String
   artists: [ArtistInput]
   tracks: [TrackInput]
+  released_date: Date
 }
 
 input ArtistInput {
@@ -168,6 +172,8 @@ input ArtistInput {
   isni: String
   mbid: String
   area: String
+  begin_date: Date
+  end_date: Date
 }
 
 input TrackInput {
@@ -176,3 +182,5 @@ input TrackInput {
   length: Long
   position: Long
 }
+
+scalar Date
