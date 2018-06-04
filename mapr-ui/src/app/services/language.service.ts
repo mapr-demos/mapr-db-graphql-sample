@@ -4,26 +4,27 @@ import {AppConfig} from "../app.config";
 import {Language} from "../models/album";
 
 const mapToLanguage = ({
-  _id,
+  id,
   name
 }): Language => ({
-  code: _id,
+  code: id,
   name
 });
 
 @Injectable()
 export class LanguageService {
-  private static SERVICE_URL = '/api/1.0/languages';
   constructor(
     private http: HttpClient,
     private config: AppConfig
   ) {}
 
   getAllLanguages(): Promise<Array<Language>> {
-    return this.http.get(`${this.config.apiURL}${LanguageService.SERVICE_URL}/`)
+    return this.http.post(`${this.config.apiURL}/graphql`, {
+      query: "{languages{id, name}}"
+    })
       .map((response: any) => {
         console.log('Languages: ', response);
-        return response.map(mapToLanguage);
+        return response.data.languages.map(mapToLanguage);
       })
       .toPromise();
   }

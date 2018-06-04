@@ -11,9 +11,7 @@ export class AuthService {
 
   isAuthenticated$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  constructor(
-    private config: AppConfig
-  ) {
+  constructor(private config: AppConfig) {
     this.isAuthenticated$.next(this.isAuthenticated);
     this.isAuthenticated$.subscribe((val) => {
       this.isAuthenticated = val;
@@ -24,17 +22,20 @@ export class AuthService {
     this.token = btoa(`${login}:${pass}`);
     const headers = new Headers();
     headers.set('Authorization', this.getAuthHeader());
-    return fetch(`${this.config.apiURL}/api/1.0/users/current`, {
-      method: 'GET',
-      headers
+    return fetch(`${this.config.apiURL}/graphql`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        query: "{ currentUser{username} }"
+      })
     })
-      .then((res) => {
-        if (res.ok) {
-          localStorage.setItem('AUTH_TOKEN', this.token);
-        }
-        this.isAuthenticated$.next(res.ok);
-        return res.ok;
-      });
+    .then((res) => {
+      if (res.ok) {
+        localStorage.setItem('AUTH_TOKEN', this.token);
+      }
+      this.isAuthenticated$.next(res.ok);
+      return res.ok;
+    });
   }
 
   getAuthHeader(): string {

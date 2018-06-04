@@ -11,17 +11,17 @@ const SEARCHING_URL_HASH = {
 };
 
 const mapToSearchResult = ({
-                             _id,
+                             id,
                              type,
                              name,
-                             image_url,
+                             imageUrl,
                              slug
                            }): SearchResult => ({
-  id: _id,
+  id,
   type,
   name,
   slug,
-  imageURL: image_url
+  imageURL: imageUrl
 });
 
 @Injectable()
@@ -41,14 +41,72 @@ export class SearchService {
   }
 
   find(searchType: string, nameEntry: string, page: number): Promise<SearchResultsPage> {
-    return this.http.get(this.getSearchURL(searchType, nameEntry, page))
-      .map((response: any) => {
-        const searchResults = response.results.map(mapToSearchResult);
-        return {
-          searchResults,
-          totalNumber: response.pagination.items
-        };
-      })
-      .toPromise();
+    if ('EVERYTHING' === searchType) {
+      return this.findEverything(nameEntry, page)
+    }
+
+    if ('ALBUMS' === searchType) {
+      return this.findAlbums(nameEntry, page)
+    }
+
+    if ('ARTISTS' === searchType) {
+      return this.findArtists(nameEntry, page)
+    }
+
+    throw new Error('Unknown search type');
+  }
+
+  findEverything(nameEntry: string, page: number): Promise<SearchResultsPage> {
+    return this.http.post(`${this.config.apiURL}/graphql`, {
+      query: "query FindByNameEntry($nameEntry: String, $page: Int, $perPage: Int) { findByNameEntry(nameEntry: $nameEntry, page: $page, perPage: $perPage){ results {id, name, slug, imageUrl, type}, pagination{items}  }}",
+      variables: {
+        nameEntry: nameEntry,
+        page: page
+      }
+    })
+    .map((response: any) => {
+      const searchResults = response.data.findByNameEntry.results.map(mapToSearchResult);
+      return {
+        searchResults,
+        totalNumber: response.data.findByNameEntry.pagination.items
+      };
+    })
+    .toPromise();
+  }
+
+  findAlbums(nameEntry: string, page: number): Promise<SearchResultsPage> {
+    return this.http.post(`${this.config.apiURL}/graphql`, {
+      query: "query FindAlbumsByNameEntry($nameEntry: String, $page: Int, $perPage: Int) { findAlbumsByNameEntry(nameEntry: $nameEntry, page: $page, perPage: $perPage){ results {id, name, slug, imageUrl, type}, pagination{items}  }}",
+      variables: {
+        nameEntry: nameEntry,
+        page: page
+      }
+    })
+    .map((response: any) => {
+      const searchResults = response.data.findAlbumsByNameEntry.results.map(mapToSearchResult);
+      return {
+        searchResults,
+        totalNumber: response.data.findAlbumsByNameEntry.pagination.items
+      };
+    })
+    .toPromise();
+  }
+
+  findArtists(nameEntry: string, page: number): Promise<SearchResultsPage> {
+    return this.http.post(`${this.config.apiURL}/graphql`, {
+      query: "query FindArtistsByNameEntry($nameEntry: String, $page: Int, $perPage: Int) { findArtistsByNameEntry(nameEntry: $nameEntry, page: $page, perPage: $perPage){ results {id, name, slug, imageUrl, type}, pagination{items}  }}",
+      variables: {
+        nameEntry: nameEntry,
+        page: page
+      }
+    })
+    .map((response: any) => {
+      const searchResults = response.data.findArtistsByNameEntry.results.map(mapToSearchResult);
+      return {
+        searchResults,
+        totalNumber: response.data.findArtistsByNameEntry.pagination.items
+      };
+    })
+    .toPromise();
   }
 }

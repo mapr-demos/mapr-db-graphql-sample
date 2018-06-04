@@ -105,7 +105,7 @@ const mapToAlbum = ({
                       // TODO add to document
                       language,
                       rating,
-                      released_date
+                      releasedDateDay
                     }): Album => ({
   id,
   title: name,
@@ -114,7 +114,7 @@ const mapToAlbum = ({
   format,
   slug,
   rating,
-  releasedDate: (released_date) ? new Date(released_date) : null,
+  releasedDate: (releasedDateDay) ? new Date(releasedDateDay) : null,
   language,
   trackList: tracks
     ? tracks.map(mapToTrack)
@@ -165,7 +165,7 @@ const mapToAlbumRequest = ({
   coverImageUrl: coverImageURL,
   country,
   format,
-  // released_date: (releasedDate) ? releasedDate.getTime() : null,
+  released_date: (releasedDate) ? releasedDate.getTime() : null,
   language: (language) ? language.code : null,
   artists: artists.map(mapToArtistRequest),
   tracks: trackList.map(mapToTrackRequest)
@@ -241,7 +241,7 @@ export class AlbumService {
   getAlbumBySlug(albumSlug: string): Promise<Album> {
     return this.http.post(`${this.config.apiURL}/graphql`,
       {
-        query: "query AlbumBySlug($slug: String) { albumBySlug(slug: $slug){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}} }",
+        query: "query AlbumBySlug($slug: String) { albumBySlug(slug: $slug){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}, releasedDateDay} }",
         variables: {
           slug: albumSlug
         }
@@ -261,7 +261,7 @@ export class AlbumService {
   deleteTrackInAlbum(albumId: string, trackId: string): Promise<Object> {
     return this.http.post(`${this.config.apiURL}/graphql`,
       {
-        query: "mutation DeleteAlbumTrack($albumId: String, $trackId: String!) { deleteTrackInAlbum(albumId: $albumId, trackId: $trackId){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}} }",
+        query: "mutation DeleteAlbumTrack($albumId: String, $trackId: String!) { deleteTrackInAlbum(albumId: $albumId, trackId: $trackId){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}, releasedDateDay} }",
         variables: {
           albumId: albumId,
           trackId: trackId
@@ -273,7 +273,7 @@ export class AlbumService {
   saveAlbumTracks(albumId: string, tracks: Array<Track>): Promise<Object> {
     return this.http.post(`${this.config.apiURL}/graphql`,
       {
-        query: "mutation SaveAlbumTracks($albumId: String, $tracks: [TrackInput!]!) { saveAlbumTracks(albumId: $albumId, tracks: $tracks){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}} }",
+        query: "mutation SaveAlbumTracks($albumId: String, $tracks: [TrackInput!]!) { saveAlbumTracks(albumId: $albumId, tracks: $tracks){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}, releasedDateDay} }",
         variables: {
           albumId: albumId,
           tracks: tracks.map(mapToTrackRequest)
@@ -285,7 +285,7 @@ export class AlbumService {
   updateAlbumTrack(albumId: string, track: Track): Promise<Object> {
     return this.http.post(`${this.config.apiURL}/graphql`,
       {
-        query: "mutation UpdateAlbumTrack($albumId: String, $track: TrackInput!) { updateAlbumTrack(albumId: $albumId, track: $track){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}} }",
+        query: "mutation UpdateAlbumTrack($albumId: String, $track: TrackInput!) { updateAlbumTrack(albumId: $albumId, track: $track){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}, releasedDateDay} }",
         variables: {
           albumId: albumId,
           track: mapToTrackRequest(track)
@@ -298,7 +298,7 @@ export class AlbumService {
     const request = mapToTrackRequest(track);
     return this.http.post(`${this.config.apiURL}/graphql`,
       {
-        query: "mutation AddTrackToAlbum($albumId: String, $track: TrackInput!) { addTrackToAlbum(albumId: $albumId, track: $track){id, name, length, position} }",
+        query: "mutation AddTrackToAlbum($albumId: String, $track: TrackInput!) { addTrackToAlbum(albumId: $albumId, track: $track){id, name, length, position}, releasedDateDay }",
         variables: {
           albumId: albumId,
           track: request
@@ -329,7 +329,7 @@ export class AlbumService {
   createNewAlbum(album: Album): Promise<Album> {
     return this.http
     .post(`${this.config.apiURL}/graphql`, {
-      query: "mutation Album($album: AlbumInput!) { createAlbum(album: $album){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}} }",
+      query: "mutation Album($album: AlbumInput!) { createAlbum(album: $album){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}, releasedDateDay} }",
       variables: {
         album: mapToAlbumRequest(album)
       }
@@ -344,7 +344,7 @@ export class AlbumService {
   updateAlbum(album: Album): Promise<Album> {
     return this.http
     .post(`${this.config.apiURL}/graphql`, {
-      query: "mutation Album($album: AlbumInput!) { updateAlbum(album: $album){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}} }",
+      query: "mutation Album($album: AlbumInput!) { updateAlbum(album: $album){id, slug, name, rating, style, coverImageUrl, barcode, status, packaging, language, script, mbid, format, country, artists{id, name}, tracks{id, name, length, position}, releasedDateDay} }",
       variables: {
         // _id: album.id,
         album: mapToAlbumRequest(album)
