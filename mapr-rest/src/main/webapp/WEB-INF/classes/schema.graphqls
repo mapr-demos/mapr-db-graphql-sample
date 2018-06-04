@@ -23,6 +23,8 @@ type Query {
 
   # User queries
   currentUser : User
+
+  languages : [Language]
 }
 
 type Mutation {
@@ -93,6 +95,11 @@ type User {
   firstName: String
   lastName: String
   password: String
+}
+
+type Language {
+  id: String
+  name: String
 }
 
 input AlbumInput {
