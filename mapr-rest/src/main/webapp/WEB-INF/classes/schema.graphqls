@@ -9,6 +9,7 @@ type Query {
   album(id: String): Album
   albumBySlug(slug: String): Album
   albums(offset: Int, limit: Int): [Album]
+  albumsPage(perPage: Long, page: Long, lang: String, sortOptions: [SortOption]): AlbumsPage
   albumsRecommended(albumId: String, limit: Int): [Album]
   albumsByNameEntry(nameEntry: String, limit: Long): [Album]
   totalAlbums: Long
@@ -141,6 +142,11 @@ type Pair {
   value: String
 }
 
+type AlbumsPage {
+  pagination: Pagination
+  results: [Album]
+}
+
 input AlbumInput {
   _id: String
   name: String
@@ -181,6 +187,11 @@ input TrackInput {
   name: String
   length: Long
   position: Long
+}
+
+input SortOption {
+  order: String
+  fields: [String]
 }
 
 scalar Date

@@ -59,6 +59,7 @@ public class GraphQLSchemaProvider {
             .dataFetcher("album", albumDataFetcher.album())
             .dataFetcher("albumBySlug", albumDataFetcher.albumBySlug())
             .dataFetcher("albums", albumDataFetcher.albums())
+            .dataFetcher("albumsPage", albumDataFetcher.albumsPage())
             .dataFetcher("albumsRecommended", albumDataFetcher.albumsRecommended())
             .dataFetcher("albumsByNameEntry", albumDataFetcher.albumsByNameEntry())
             .dataFetcher("totalAlbums", albumDataFetcher.totalAlbums())

@@ -3,6 +3,7 @@ package com.mapr.music.api.graphql.schema;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mapr.music.api.graphql.errors.GraphQLUnauthorizedError;
+import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.TrackDto;
@@ -75,6 +76,21 @@ public class AlbumDataFetcher {
       String nameEntry = env.getArgument("nameEntry");
       Long limit = env.getArgument("limit");
       return albumService.searchAlbums(nameEntry, limit);
+    };
+  }
+
+  public DataFetcher albumsPage() {
+    return (env) -> {
+
+      Long perPage = env.getArgument("perPage");
+      Long page = env.getArgument("page");
+      List<SortOption> sortOptions = MAPPER
+          .convertValue(env.getArgument("sortOptions"), new TypeReference<List<SortOption>>() {
+          });
+
+      return (env.containsArgument("lang") && env.getArgument("lang") != null)
+          ? albumService.getAlbumsPageByLanguage(perPage, page, sortOptions, env.getArgument("lang"))
+          : albumService.getAlbumsPage(perPage, page, sortOptions);
     };
   }
 
