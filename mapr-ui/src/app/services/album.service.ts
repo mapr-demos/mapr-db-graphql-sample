@@ -62,6 +62,18 @@ const SORT_HASH = {
   'RELEASE_ASC_TITLE_DESC': (url) => SORT_HASH.TITLE_DESC(SORT_HASH.RELEASE_ASC(url))
 };
 
+const SORTS = {
+  'NO_SORTING': undefined,
+  'RELEASE_DESC': [{order: "DESC", fields: ["released_date"]}],
+  'RELEASE_ASC': [{order: "ASC", fields: ["released_date"]}],
+  'TITLE_ASC': [{order: "ASC", fields: ["name"]}],
+  'TITLE_DESC': [{order: "DESC", fields: ["name"]}],
+  'RELEASE_DESC_TITLE_ASC': [{order: "DESC", fields: ["released_date"]}, {order: "ASC", fields: ["name"]}],
+  'RELEASE_DESC_TITLE_DESC': [{order: "DESC", fields: ["released_date"]}, {order: "DESC", fields: ["name"]}],
+  'RELEASE_ASC_TITLE_ASC': [{order: "ASC", fields: ["released_date"]}, {order: "ASC", fields: ["name"]}],
+  'RELEASE_ASC_TITLE_DESC': [{order: "ASC", fields: ["released_date"]}, {order: "DESC", fields: ["name"]}]
+};
+
 interface PageRequest {
   pageNumber: number,
   sortType: string,
@@ -201,10 +213,12 @@ export class AlbumService {
 
     return this.http.post(`${this.config.apiURL}/graphql`,
       {
-        query: "query Albums($offset: Int, $limit: Int) { albums(offset: $offset, limit: $limit){name, artists{id, name, slug}, coverImageUrl, language, slug }, totalAlbums }",
+        query: "query AlbumsPage($perPage: Long, $page: Long, $lang: String, $sortOptions: [SortOption]) { albumsPage(perPage: $perPage, page: $page, lang: $lang, sortOptions: $sortOptions){pagination{items}, results{name, artists{id, name, slug}, coverImageUrl, language, slug }} }",
         variables: {
-          offset: (request.pageNumber - 1) * PAGE_SIZE,
-          limit: PAGE_SIZE
+          page: request.pageNumber,
+          perPage: PAGE_SIZE,
+          lang: request.lang ? request.lang : undefined,
+          sortOptions: SORTS[request.sortType]
         }
       }
     )
@@ -213,7 +227,7 @@ export class AlbumService {
     })
     .map(({response, languages}) => {
       console.log('Albums: ', response);
-      const albums = response.data.albums
+      const albums = response.data.albumsPage.results
       .map((album) => {
         album.language = find(languages, (language) => language.code === album.language);
         return album;
@@ -222,7 +236,7 @@ export class AlbumService {
 
       return {
         albums,
-        totalNumber: response.data.totalAlbums
+        totalNumber: response.data.albumsPage.pagination.items
       };
     })
     .toPromise();
