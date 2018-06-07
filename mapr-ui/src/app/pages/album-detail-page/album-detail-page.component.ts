@@ -35,7 +35,6 @@ export class AlbumDetailPage implements OnInit {
 
   album: Album;
   recommendedAlbums: Array<Album> = null;
-  sourceURL: string;
 
   editedTrackId = null;
   nameEditedTrack = '';
@@ -125,7 +124,6 @@ export class AlbumDetailPage implements OnInit {
     this.activatedRoute.paramMap
     .switchMap((params: ParamMap) => {
       const albumSlug = params.get('albumSlug');
-      this.sourceURL = this.albumService.getAlbumBySlugURL(albumSlug);
       return this.albumService.getAlbumBySlug(albumSlug);
     })
     .subscribe((album) => {

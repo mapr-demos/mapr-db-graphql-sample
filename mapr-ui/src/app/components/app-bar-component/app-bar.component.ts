@@ -8,8 +8,6 @@ import {Router} from "@angular/router";
   templateUrl: './app-bar.component.html',
 })
 export class AppBar {
-  @Input()
-  sourceURL: string = null;
 
   isAuthenticated: ReplaySubject<boolean>;
 

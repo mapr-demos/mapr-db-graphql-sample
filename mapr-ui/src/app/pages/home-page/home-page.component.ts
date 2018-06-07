@@ -34,7 +34,6 @@ export class HomePage implements OnInit {
   albums: Array<Album> = [];
   totalAlbums: number;
   pageNumber: number;
-  sourceURL: string;
   sortOptions: Array<SelectOption> = SORT_OPTIONS;
   languageOptions: Array<Language>;
   selectedLanguageCode: string;
@@ -51,7 +50,6 @@ export class HomePage implements OnInit {
         this.selectedLanguageCode = lang;
         this.albums = [];
         const request = {pageNumber: page, sortType: this.sortType, lang};
-        this.sourceURL = this.albumService.getAlbumsPageURL(request);
         return this.albumService.getAlbumsPage(request)
           .then((albumsPage: AlbumsPage) => ({albumsPage, page}));
       })

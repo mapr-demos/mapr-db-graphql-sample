@@ -24,16 +24,13 @@ export class ArtistPage implements OnInit {
   currentRate = 0;
   artist: Artist;
   recommendedArtists: Array<Artist> = null;
-  sourceURL: string;
 
   ngOnInit(): void {
     this.activatedRoute.paramMap
       .switchMap((params: ParamMap) => {
         // const artistId = params.get('artistId');
-        // this.sourceURL = this.artistService.getArtistByIdURL(artistId);
         // return this.artistService.getArtistById(artistId);
         const artistSlug = params.get('artistSlug');
-        this.sourceURL = this.artistService.getArtistBySlugURL(artistSlug);
         return this.artistService.getArtistBySlug(artistSlug);
       })
       .subscribe((artist) => {

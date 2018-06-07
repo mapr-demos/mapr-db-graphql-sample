@@ -26,7 +26,6 @@ export class SearchResultsPage implements OnInit {
   selectedSearchOption = null;
   searchResults = null;
   entry = null;
-  sourceURL = null;
   totalNumber: number;
   pageNumber: number;
 
@@ -40,7 +39,6 @@ export class SearchResultsPage implements OnInit {
       .switchMap(({type = 'EVERYTHING', entry, page = 1}) => {
         this.selectedSearchOption = type;
         this.entry = entry;
-        this.sourceURL = this.searchService.getSearchURL(type, entry, page);
         return this.searchService.find(type, entry, page).then((searchResultsPage: SearchResultsPage) => ({
           searchResultsPage,
           page

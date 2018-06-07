@@ -19,7 +19,6 @@ import {AuthenticatedGuard} from "./guards/authenticated.guard";
 import {AddArtistPage} from "./pages/add-artist-page/add-artist-page.component";
 import {ArtistEditForm} from "./components/artist-edit-form-component/artist-edit-form.component";
 import {EditArtistPage} from "./pages/edit-artist-page/edit-artist-page.component";
-import {ApiReferencePage} from "./pages/api-reference-page/api-reference-page.component";
 import {SearchResultsPage} from "./pages/search-results-page/search-results-page.component";
 
 
@@ -77,10 +76,6 @@ const appRoutes: Routes = [
     component: LoginPage
   },
   {
-    path: 'api-reference',
-    component: ApiReferencePage
-  },
-  {
     path: 'search',
     component: SearchResultsPage
   },
@@ -106,7 +101,6 @@ const appRoutes: Routes = [
     EditAlbumPage,
     EditArtistPage,
     LoginPage,
-    ApiReferencePage,
     SearchResultsPage
   ],
   imports: [

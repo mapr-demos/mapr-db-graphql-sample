@@ -24,7 +24,6 @@ export class ReportingPage implements OnInit{
   ];
   selectedReportOption = null;
   reportingResults = null;
-  sourceURL = null;
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
@@ -35,7 +34,6 @@ export class ReportingPage implements OnInit{
     this.activatedRoute.queryParams
       .switchMap(({report = 'TOP_5'}) => {
         this.selectedReportOption = report;
-        this.sourceURL = this.reportingService.getReportsURL(report);
         return this.reportingService.getReports(report)
       })
       .subscribe((reportResults) => {

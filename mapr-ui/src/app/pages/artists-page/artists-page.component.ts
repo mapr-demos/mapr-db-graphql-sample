@@ -31,14 +31,12 @@ export class ArtistsPageComponent implements OnInit {
   artists: Array<Artist> = [];
   totalAlbums: number;
   pageNumber: number;
-  sourceURL: string;
 
   ngOnInit(): void {
 
     this.route.queryParams
       .switchMap(({page = 1}: QueryParams) => {
         this.artists = [];
-        this.sourceURL = this.artistService.getArtistPageURL(page);
         return this.artistService.getArtistPage(page)
           .then((artistsPage: ArtistsPage) => ({artistsPage, page}));
       })
