@@ -39,6 +39,8 @@ type Query {
   albums(offset: Int, limit: Int): [Album]
   artist(id: String): Artist
   artists(offset: Int, limit: Int): [Artist]
+  
+  ...
 }
 
 type Mutation {
@@ -49,6 +51,8 @@ type Mutation {
   createArtist(artist: ArtistInput!): Artist
   updateArtist(artist: ArtistInput!): Artist
   deleteArtist(id: String!): Boolean
+  
+  ...
 }
 ```
 
@@ -87,6 +91,10 @@ input AlbumInput {
   mbid: String
   format: String
   country: String
+  coverImageUrl: String
+  artists: [ArtistInput]
+  tracks: [TrackInput]
+  released_date: Date
 }
 
 input ArtistInput {
@@ -97,8 +105,13 @@ input ArtistInput {
   profileImageUrl: String
   imagesUrls: [String]
   disambiguationComment: String
+  albums: [AlbumInput]
+  ipi: String
+  isni: String
   mbid: String
   area: String
+  begin_date: Date
+  end_date: Date
 }
 ```
 
@@ -120,6 +133,9 @@ type Album {
   mbid: String
   format: String
   country: String
+  slug: String
+  rating: Float
+  releasedDateDay: Date
 }
 
 type Artist {
@@ -133,6 +149,11 @@ type Artist {
   disambiguationComment: String
   mbid: String
   area: String
+  slug: String
+  ipi: String
+  isni: String
+  beginDateDay: Date
+  endDateDay: Date
 }
 
 type Track {
@@ -146,6 +167,15 @@ type Track {
 In line `id: String!` `id` stands by field's name and `String!` by field's type. `!` character means that field is 
 required. Square brackets are used to declare lists.
 
+
+### Custom scalar type
+
+Note, that schema contains definition of custom scalar type `Date`:
+```
+scalar Date
+```
+
+Below you can find the explanation of how to implement such custom GraphQL scalar types.
 
 ## Server side implementation
 
@@ -192,81 +222,166 @@ containing a ready-made servlet for accepting GraphQL queries.
 
 [GraphQLEndpoint.java](mapr-rest/src/main/java/com/mapr/music/api/graphql/GraphQLEndpoint.java) extends 
 `SimpleGraphQLServlet` which is ready-made servlet for accepting GraphQL queriesis servlet, provided by 
-`graphql-java-servlet`. It loads [MapR Music GraphQL schema](mapr-rest/src/main/webapp/WEB-INF/classes/schema.graphqls) 
-and declares data fetchers for each GraphQL type.
+`graphql-java-servlet`.
 
-Method, which loads GraphQL schema:
+[GraphQLEndpoint.java :](mapr-rest/src/main/java/com/mapr/music/api/graphql/GraphQLEndpoint.java)
 ```
-  private static GraphQLSchema createGraphQLSchema(AlbumService albumService, ArtistService artistService) {
+public class GraphQLEndpoint extends SimpleGraphQLServlet {
 
-    SchemaParser schemaParser = new SchemaParser();
-    InputStream schemaFile = GraphQLEndpoint.class.getClassLoader().getResourceAsStream(SCHEMA_FILENAME);
-    TypeDefinitionRegistry typeRegistry = schemaParser.parse(new InputStreamReader(schemaFile));
-
-    return new SchemaGenerator().makeExecutableSchema(typeRegistry, buildRuntimeWiring(albumService, artistService));
+  @Inject
+  public GraphQLEndpoint(GraphQLSchemaProvider schemaProvider) {
+    super(schemaProvider.schema());
   }
+
+  @Override
+  protected GraphQLErrorHandler getGraphQLErrorHandler() {
+    return new DefaultGraphQLErrorHandler() {
+
+      @Override
+      protected List<GraphQLError> filterGraphQLErrors(List<GraphQLError> errors) {
+        return errors.stream()
+            .filter(e -> e instanceof ExceptionWhileDataFetching || super.isClientError(e))
+            .map(e -> e instanceof ExceptionWhileDataFetching ? new GraphQLErrorWrapper((ExceptionWhileDataFetching) e)
+                : e)
+            .collect(Collectors.toList());
+      }
+    };
+  }
+}
 ```
 
-Declaring Data Fetchers for each GraphQL type:
+
+### GraphQL Schema Provider
+
+GraphQL Schema Provider loads [MapR Music GraphQL schema](mapr-rest/src/main/webapp/WEB-INF/classes/schema.graphqls), 
+and wires data fetchers for each GraphQL type.
+
+[GraphQLSchemaProvider.java :](mapr-rest/src/main/java/com/mapr/music/api/graphql/schema/GraphQLSchemaProvider.java)
 ```
-  private static RuntimeWiring buildRuntimeWiring(AlbumService albumService, ArtistService artistService) {
-    return RuntimeWiring.newRuntimeWiring()
-      .type("Query", typeWiring -> typeWiring
-        .dataFetcher("album", (env) -> albumService.getAlbumById(env.getArgument("id")))
-        .dataFetcher("albums", (env) -> {
-          Integer offset = env.getArgument("offset");
-          Integer limit = env.getArgument("limit");
-          return albumService.getAlbums(offset, limit);
-        })
-        .dataFetcher("artist", (env) -> artistService.getArtistById(env.getArgument("id")))
-        .dataFetcher("artists", (env) -> {
-          Integer offset = env.getArgument("offset");
-          Integer limit = env.getArgument("limit");
-          return artistService.getArtists(offset, limit);
-        })
-      )
-      .type("Mutation", typeWiring -> typeWiring
-        .dataFetcher("createAlbum",
-          (env) -> albumService.createAlbum(MAPPER.convertValue(env.getArgument("album"), AlbumDto.class)))
-        .dataFetcher("updateAlbum",
-          (env) -> albumService.updateAlbum(MAPPER.convertValue(env.getArgument("album"), AlbumDto.class)))
-        .dataFetcher("deleteAlbum", (env) -> {
-          albumService.deleteAlbumById(env.getArgument("id"));
-          return true;
-        })
-        .dataFetcher("createArtist",
-          (env) -> artistService.createArtist(MAPPER.convertValue(env.getArgument("artist"), ArtistDto.class)))
-        .dataFetcher("updateArtist",
-          (env) -> artistService.updateArtist(MAPPER.convertValue(env.getArgument("artist"), ArtistDto.class)))
-        .dataFetcher("deleteArtist", (env) -> {
-          artistService.deleteArtistById(env.getArgument("id"));
-          return true;
-        })
-      )
-      .type("Album", typeWiring -> typeWiring
-        .dataFetcher("artists", (env) -> {
-          AlbumDto source = env.getSource();
-          if (source.getArtists() == null || source.getArtists().isEmpty()) {
-            return source.getArtists();
-          } else {
-            return source.getArtists().stream().map(ArtistDto::getId).map(artistService::getArtistById)
-              .collect(Collectors.toList());
-          }
-        })
-      )
-      .type("Artist", typeWiring -> typeWiring
-        .dataFetcher("albums", (env) -> {
-          ArtistDto source = env.getSource();
-          if (source.getAlbums() == null || source.getAlbums().isEmpty()) {
-            return source.getAlbums();
-          } else {
-            return source.getAlbums().stream().map(AlbumDto::getId).map(albumService::getAlbumById)
-              .collect(Collectors.toList());
-          }
-        })
-      )
-      .build();
+  ...
+  
+  private RuntimeWiring buildRuntimeWiring() {
+      return RuntimeWiring.newRuntimeWiring()
+          .scalar(DateScalar.DATE)
+          .type("Query", typeWiring -> typeWiring
+              .dataFetcher("currentUser", userDataFetcher.currentUser())
+  
+              // Album
+              .dataFetcher("album", albumDataFetcher.album())
+               
+               ...
+               
+              .dataFetcher("getNumberOfAlbumsPerYear", reportingDataFetcher.getNumberOfAlbumsPerYear())
+          )
+          .type("Mutation", typeWiring -> typeWiring
+  
+              // Album
+              .dataFetcher("createAlbum", albumDataFetcher.createAlbum())
+              .dataFetcher("updateAlbum", albumDataFetcher.updateAlbum())
+              .dataFetcher("deleteAlbum", albumDataFetcher.deleteAlbum())
+               
+               ...
+               
+              .dataFetcher("recomputeStatistics", statisticsDataFetcher.recomputeStatistics())
+          )
+          .type("Album", typeWiring -> typeWiring
+              .dataFetcher("artists", albumDataFetcher.artists())
+          )
+          .type("Artist", typeWiring -> typeWiring
+              .dataFetcher("albums", artistDataFetcher.albums())
+          )
+          .build();
+    }
+  
+  ...
+  
+```
+
+### GraphQL DataFetchers
+
+Each graphql field type has a `graphql.schema.DataFetcher` associated with it. Also this type of handlers often called 
+as `resolvers`. 
+Package [com.mapr.music.api.graphql.schema](mapr-rest/src/main/java/com/mapr/music/api/graphql/schema/) contains data 
+fetchers for all defined types.
+
+For instance, `LanguageDataFetcher` data fetcher defines how query  on the `languages` field will be processed by 
+GraphQL service:
+```
+public class LanguageDataFetcher {
+
+  private final LanguageDao languageDao;
+
+  @Inject
+  public LanguageDataFetcher(LanguageDao languageDao) {
+    this.languageDao = languageDao;
   }
+
+  public DataFetcher languages() {
+    return (env) -> languageDao.getList();
+  }
+
+}
+```
+
+### Custom scalar type
+
+[DateScalar.java](mapr-rest/src/main/java/com/mapr/music/api/graphql/schema/DateScalar.java) class is used to define 
+custom `Date` scalar type. which corresponds to the `java.util.Date` and serialized as UNIX timestamp. 
+
+```
+public class DateScalar {
+
+  private DateScalar() {
+  }
+
+  public static final GraphQLScalarType DATE = new GraphQLScalarType("Date",
+      "A custom scalar that handles dates",
+
+      new Coercing<Date, Long>() {
+        @Override
+        public Long serialize(Object dataFetcherResult) throws CoercingSerializeException {
+          return serializeDate(dataFetcherResult);
+        }
+
+        @Override
+        public Date parseValue(Object input) throws CoercingParseValueException {
+          return parseDateFromVariable(input);
+        }
+
+        @Override
+        public Date parseLiteral(Object input) throws CoercingParseLiteralException {
+          return parseDateFromAstLiteral(input);
+        }
+      });
+
+  private static Long serializeDate(Object dataFetcherResult) {
+
+    if (dataFetcherResult instanceof Date) {
+      Date date = (Date) dataFetcherResult;
+      return date.getTime();
+    }
+
+    throw new CoercingSerializeException("Unable to serialize " + dataFetcherResult + " as a date");
+  }
+
+  private static Date parseDateFromVariable(Object input) {
+    if (input instanceof Long) {
+      Long dateInMillis = (Long) input;
+      return new Date(dateInMillis);
+    }
+
+    throw new CoercingParseValueException("Unable to parse variable value " + input + " as a date");
+  }
+
+  private static Date parseDateFromAstLiteral(Object input) {
+    if (input instanceof IntValue) {
+      Long dateInMillis = ((IntValue) input).getValue().longValue();
+      return new Date(dateInMillis);
+    }
+
+    throw new CoercingParseLiteralException("Value is not any date: '" + input + "'");
+  }
+}
 ```
 
 ### Declare GraphQLEndpoint servlet mapping
