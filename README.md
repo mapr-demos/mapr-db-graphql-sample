@@ -7,6 +7,12 @@
 * [Server side implementation](#server-side-implementation)
 * [Querying GraphQL](#querying-graphql)
 
+## Security Note
+
+This demo uses an older version of Spark that has known security problems. You should update the dependencies 
+to Spark 2.2.1 or later. This may result in a need for some code changes as a result of changes from 2.1 to 2.2 
+Spark versions.
+
 ## Overview
 
 This project is sample application that exposes MapR-DB JSON tables using GraphQL. 
