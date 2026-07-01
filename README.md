@@ -7,11 +7,16 @@
 * [Server side implementation](#server-side-implementation)
 * [Querying GraphQL](#querying-graphql)
 
-## Security Note
+## Security Notes
 
 This demo uses an older version of Spark that has known security problems. You should update the dependencies 
 to Spark 2.2.1 or later. This may result in a need for some code changes as a result of changes from 2.1 to 2.2 
 Spark versions.
+
+This demo also uses older versions of Angular that are subject to serious security flaws. You should update to
+Angular 22.0.1 at least and review this (old) code for other vulnerabilities as well.
+
+Please do not use this code as it is.
 
 ## Overview
 
